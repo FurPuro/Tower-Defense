@@ -114,7 +114,7 @@ while True:
                                 targetEnemy = enemy
                                 break
                         if targetEnemy != None:
-                            lookAt(tower.sprite,targetEnemy.sprite)
+                            lookAt(tower.sprite,targetEnemy)
                             targetEnemy.health -= tower.damage
 
         if hotbar_opened == True:
