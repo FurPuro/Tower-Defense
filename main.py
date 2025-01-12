@@ -15,6 +15,7 @@ clock = pygame.time.Clock()
 waveTimer = FPS*55
 summonTimer = FPS
 summonTimerTimes = 0
+summonTimerNeedTimes = 0
 
 playbutton = Button(WIDTH/2-150/2,HEIGHT/2-60/2,150,60,"menu",PLAY_BUTTON_COLOR,rf"""
 grid = loadLevel()
@@ -58,16 +59,20 @@ while True:
             waveTimer = 0
             waveMobs = generateWave(wave)
             wave += 1
+            summonTimerNeedTimes = len(waveMobs)
+        if summonTimer == FPS and summonTimerTimes < summonTimerNeedTimes:
+            summonTimer = 0
             for waveEnemy,waveEnemyCount in waveMobs.items():
                 # print(waveEnemy,waveEnemyCount)
-                for i in range(0,waveEnemyCount):
-                    for enemy in enemies:
-                        # print(waveTimer)
-                        if enemy.id == waveEnemy and waveEnemyCount > 0:
-                            placedEnemy = Enemy(enemy.sprite.rect.x,enemy.sprite.rect.y,enemy.sprite.rect.w,enemy.sprite.rect.h,enemy.sprite.state,enemy.sprite.path,enemy.id,enemy.walkSpeed,enemy.health)
-                            placedEnemy.sprite.rect.centerx = spawnCenterX+GRID_SIZE
-                            placedEnemy.sprite.rect.centery = spawnCenterY
-                            enemiesOnMap.append(placedEnemy)
+                for enemy in enemies:
+                    # print(waveTimer)
+                    if enemy.id == waveEnemy and waveEnemyCount > 0:
+                        placedEnemy = Enemy(enemy.sprite.rect.x,enemy.sprite.rect.y,enemy.sprite.rect.w,enemy.sprite.rect.h,enemy.sprite.state,enemy.sprite.path,enemy.id,enemy.walkSpeed,enemy.health)
+                        placedEnemy.sprite.rect.centerx = spawnCenterX+GRID_SIZE
+                        placedEnemy.sprite.rect.centery = spawnCenterY
+                        enemiesOnMap.append(placedEnemy)
+                        waveMobs.pop(waveEnemy)
+            summonTimerTimes += 1
         
         for enemy in enemiesOnMap:
             enemy.sprite.draw(screen)
@@ -96,6 +101,7 @@ while True:
             pygame.quit()
 
         waveTimer += 1
+        summonTimer += 1
 
         for tower in placedTowers:
             tower.sprite.draw(screen)
