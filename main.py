@@ -52,16 +52,8 @@ while True:
             if "color" in obj and "x" in obj and "y" in obj and "id" in obj:
                 pygame.draw.rect(screen,obj["color"],(obj["x"],obj["y"],GRID_SIZE,GRID_SIZE))
                 if int(obj["id"]) == 2:
-                    # print(obj["x"],obj["y"])
                     spawnCenterX = obj["x"]+(GRID_SIZE/2)
                     spawnCenterY = obj["y"]+(GRID_SIZE/2)
-        # for obj in grid:
-        #     if "color" in obj and "x" in obj and "y" in obj and "id" in obj and :
-        #         break
-        #         # if obj["id"] == "2":
-        #         #     spawnCenterX = obj["x"]+GRID_SIZE/2
-        #         #     spawnCenterY = obj["y"]+GRID_SIZE/2
-        #         #     break
         if waveTimer >= FPS*60:
             waveTimer = 0
             waveMobs = generateWave(wave)
@@ -72,9 +64,7 @@ while True:
                     for enemy in enemies:
                         # print(waveTimer)
                         if enemy.id == waveEnemy and waveEnemyCount > 0:
-                            # print("Прошёл, крут")
                             placedEnemy = Enemy(enemy.sprite.rect.x,enemy.sprite.rect.y,enemy.sprite.rect.w,enemy.sprite.rect.h,enemy.sprite.state,enemy.sprite.path,enemy.id,enemy.walkSpeed,enemy.health)
-                            # print(placedEnemy.sprite.rect)
                             placedEnemy.sprite.rect.centerx = spawnCenterX+GRID_SIZE
                             placedEnemy.sprite.rect.centery = spawnCenterY
                             enemiesOnMap.append(placedEnemy)
@@ -134,8 +124,6 @@ while True:
                             # projectile.draw(screen)
                             print("Pew")
                             targetEnemy.health -= tower.damage
-                        # else:
-                        #     print("Target not found")
 
         if hotbar_opened == True:
             pygame.draw.rect(screen,HOTBAR_COLOR,(0,0,WIDTH,GRID_SIZE*3))
@@ -153,21 +141,17 @@ while True:
                 for tower in equippedTowers:
                     if tower.sprite.rect.collidepoint(mx,my):
                         selected_tower = Tower(tower.sprite.rect.x,tower.sprite.rect.y,tower.sprite.rect.w,tower.sprite.rect.h,tower.sprite.state,tower.sprite.path,tower.projectileSprite,tower.id,tower.price,tower.upgradePrice,tower.damage,tower.upgradeDamage,tower.attacksPerSecond,tower.upgradedAttacksPerSecond,tower.maxDistance,tower.upgradedMaxDistance)
-                        # print("click")
                 if selected_tower != None and hotbar_opened == False:
                     for obj in grid:
                         if "color" in obj and "x" in obj and "y" in obj and "id" in obj:
-                            # print(obj["x"],obj["y"],mx,my)
                             if mx >= obj["x"] and my >= obj["y"] and mx <= obj["x"]+GRID_SIZE and my <= obj["y"]+GRID_SIZE:
                                 goodPlace = True
-                                # print("Click")
                                 for x in range(-GRID_SIZE,GRID_SIZE*2,GRID_SIZE):
                                     for y in range(-GRID_SIZE,GRID_SIZE*2,GRID_SIZE):
                                         for obj2 in grid:
                                             if "color" in obj2 and "x" in obj2 and "y" in obj2 and "id" in obj2:
                                                 if obj["x"]+x == obj2["x"] and obj["y"]+y == obj2["y"] and obj["x"]+x >= 0 and obj["y"]+y >= 0 and obj["x"]+x <= WIDTH and obj["y"]+y <= HEIGHT:
                                                     if int(obj2["id"]) != 0:
-                                                        # print("This is a bad place!",obj2["id"],mx,my)
                                                         goodPlace = False
 
                                 if goodPlace == True and marbies >= selected_tower.price:
@@ -183,7 +167,6 @@ while True:
                                     placedTower = Tower(selected_tower.sprite.rect.x,selected_tower.sprite.rect.y,selected_tower.sprite.rect.w,selected_tower.sprite.rect.h,selected_tower.sprite.state,selected_tower.sprite.path,selected_tower.projectileSprite,selected_tower.id,selected_tower.price,selected_tower.upgradePrice,selected_tower.damage,selected_tower.upgradeDamage,selected_tower.attacksPerSecond,selected_tower.upgradedAttacksPerSecond,selected_tower.maxDistance,selected_tower.upgradedMaxDistance)
                                     placedTower.sprite.rect.x = obj["x"]-GRID_SIZE
                                     placedTower.sprite.rect.y = obj["y"]-GRID_SIZE
-                                    # print(placedTower.sprite.rect)
                                     placedTowers.append(placedTower)
                                                         
             elif event.type == pygame.KEYDOWN:
@@ -200,4 +183,4 @@ while True:
     pygame.display.update()
     clock.tick(FPS)
 
-#ДЗ проект с рабочей с кор механикой
+#ДЗ проект
