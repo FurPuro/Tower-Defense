@@ -8,6 +8,7 @@ class Sprite:
         self.state = state
         if os.path.isfile(str(self.display)):
             self.path = colorOrImagePath
+            self.original_image = pygame.image.load(self.display)
             self.display = pygame.image.load(self.display)
         sprites.append(self)
     def draw(self,screen):

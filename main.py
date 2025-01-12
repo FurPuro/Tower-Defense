@@ -6,7 +6,7 @@ from button import Button
 from tower import Tower
 from enemy import Enemy
 from config import *
-from utils import loadLevel,generateWave
+from utils import loadLevel,generateWave,lookAt
 
 pygame.init()
 
@@ -114,15 +114,7 @@ while True:
                                 targetEnemy = enemy
                                 break
                         if targetEnemy != None:
-                            # rel_x, rel_y = targetEnemy.sprite.rect.centerx - tower.sprite.rect.centerx, targetEnemy.sprite.rect.centery - tower.sprite.rect.centery
-                            # angle = (180 / math.pi) * -math.atan2(rel_y, rel_x)
-                            # tower.sprite.display = pygame.transform.rotate(tower.sprite.display, int(angle))
-                            # tower.sprite.rect =tower.sprite.display.get_rect(center=tower.sprite.display)
-                            # projectile = copy.copy(tower.projectileSprite)
-                            # projectile.rect.x = targetEnemy.sprite.x
-                            # projectile.rect.y = targetEnemy.sprite.y
-                            # projectile.draw(screen)
-                            print("Pew")
+                            lookAt(tower.sprite,targetEnemy.sprite)
                             targetEnemy.health -= tower.damage
 
         if hotbar_opened == True:
