@@ -174,4 +174,4 @@ while True:
     pygame.display.update()
     clock.tick(FPS)
 
-#ДЗ проект, не может быть
+#ДЗ проект
