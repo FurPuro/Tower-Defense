@@ -38,4 +38,4 @@ def lookAt(sprite,sprite2):
     rel_x, rel_y = sprite2.rect.y - sprite.rect.x, sprite2.rect.y - sprite.rect.y
     angle = (180 / math.pi) * -math.atan2(rel_y, rel_x)
     sprite.display = pygame.transform.rotate(sprite.original_image, int(angle))
-    sprite.rect = sprite.display.get_rect(center=sprite.rect)
+    # sprite.rect = sprite.display.get_rect(center=sprite.rect)

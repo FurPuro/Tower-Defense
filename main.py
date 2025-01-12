@@ -58,10 +58,8 @@ while True:
             wave += 1
             summonTimerNeedTimes = len(waveMobs)
             for waveEnemy,waveEnemyCount in waveMobs.items():
-                # print(waveEnemy,waveEnemyCount)
                 for i in range(0,waveEnemyCount):
                     for enemy in enemies:
-                        # print(waveTimer)
                         if enemy.id == waveEnemy and waveEnemyCount > 0:
                             placedEnemy = copy.copy(enemy) #Enemy(enemy.sprite.rect.x,enemy.sprite.rect.y,enemy.sprite.rect.w,enemy.sprite.rect.h,enemy.sprite.state,enemy.sprite.path,enemy.id,enemy.walkSpeed,enemy.health)
                             placedEnemy.sprite.rect.centerx = spawnCenterX+GRID_SIZE
@@ -113,7 +111,7 @@ while True:
                                 targetEnemy = enemy
                                 break
                         if targetEnemy != None:
-                            lookAt(tower.sprite,targetEnemy.sprite)
+                            # lookAt(tower.sprite,targetEnemy.sprite)
                             targetEnemy.health -= tower.damage
 
         if hotbar_opened == True:
