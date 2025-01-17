@@ -71,7 +71,7 @@ while True:
             summonTimer = 0
             summonTimerTimes = 0
             summonTimerNeedTimes = len(waveMobs)
-        if summonTimer >= FPS/10:
+        if summonTimer >= FPS/3:
             summonTimer = 0
             if summonTimerNeedTimes > 0 and summonTimerTimes < summonTimerNeedTimes:
                 summonTimerTimes += 1
