@@ -2,6 +2,7 @@ import pygame
 import os
 import math
 from config import *
+import random
 def loadLevel():
     gridList = []
     save = open(fr"{LEVELS_DIR}\lvl{level}.txt")
@@ -30,11 +31,17 @@ def getObjectInGrid(x,y):
     return None
 def generateWave(waves):
     waveMobs = []
-    for i in range(0,math.floor(2*((waves-0.5)*2))):
-        waveMobs.append("basicZombie")
-    if math.floor(2*(waves-1)) > 0:
-        for i in range(0,math.floor(2*(waves-1))):
+    if waves > 1:
+        for i in range(1,round(1.7*waves)):
+            waveMobs.append("basicZombie")
+        for i in range(1,round(1.5*waves)):
             waveMobs.append("fastZombie")
+        for i in range(1,round(1.45*waves)):
+            waveMobs.append("heavyZombie")
+    else:
+        for i in range(0,round(2*1)):
+            waveMobs.append("basicZombie")
+    random.shuffle(waveMobs)
     return waveMobs
 def lookAt(sprite,sprite2):
     rel_x, rel_y = sprite2.rect.y - sprite.rect.x, sprite2.rect.y - sprite.rect.y

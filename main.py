@@ -12,7 +12,7 @@ pygame.init()
 
 screen = pygame.display.set_mode((WIDTH,HEIGHT))
 clock = pygame.time.Clock()
-waveTimer = FPS*25
+waveTimer = FPS*40
 summonTimerTimes = 0
 summonTimer = 0
 summonTimerNeedTimes = 0
@@ -21,20 +21,22 @@ basicFont = pygame.font.SysFont("Comic Sans MS",15)
 marbiesText = basicFont.render(f"{marbies}m",True,HOTBAR_COLOR)
 healthText = basicFont.render(f"{castle_health}hp",True,HOTBAR_COLOR)
 
-playbutton = Button(WIDTH/2-150/2,HEIGHT/2-60/2,150,60,"menu",PLAY_BUTTON_COLOR,rf"""
+playbutton = Button(WIDTH/2-240/2,HEIGHT/2-120/2,240,120,"menu",rf"{IMAGES_DIR}\playButton.png",rf"""
 grid = loadLevel()
 wave = 1
 castle_health = CASTLE_MAX_HEALTH
 game_state = 'game'
 """)
-
+playbutton.sprite.display = pygame.transform.scale(playbutton.sprite.display,(playbutton.sprite.rect.w,playbutton.sprite.rect.h))
 bowTower = Tower(0,0,90,90,"none",fr"{IMAGES_DIR}\bowTurret.png",fr"{IMAGES_DIR}\arrow.png","bow0",100,150,1,2,0.8,1,180,210,False)
 
 towersTimer = {}
 
 equippedTowers.append(bowTower)
 
-basicZombie = Enemy(0,0,60,60,"none",fr"{IMAGES_DIR}\basicZombie.png","basicZombie",1,10,False)
+basicZombie = Enemy(0,0,60,60,"none",fr"{IMAGES_DIR}\basicZombie.png","basicZombie",2,13,False)
+fastZombie = Enemy(0,0,60,60,"none",fr"{IMAGES_DIR}\fastZombie.png","fastZombie",3,8,False)
+heavyZombie = Enemy(0,0,60,60,"none",fr"{IMAGES_DIR}\heavyZombie.png","heavyZombie",1,40,False)
 
 while True:
     if game_state == "menu":
@@ -62,13 +64,14 @@ while True:
                 if int(obj["id"]) == 2:
                     spawnCenterX = obj["x"]+(GRID_SIZE/2)
                     spawnCenterY = obj["y"]+(GRID_SIZE/2)
-        if waveTimer >= FPS*30:
+        if waveTimer >= FPS*45:
             waveTimer = 0
             wave += 1
+            marbies += wave*40
             summonTimer = 0
             summonTimerTimes = 0
             summonTimerNeedTimes = len(waveMobs)
-        if summonTimer >= FPS*1.5:
+        if summonTimer >= FPS/10:
             summonTimer = 0
             if summonTimerNeedTimes > 0 and summonTimerTimes < summonTimerNeedTimes:
                 summonTimerTimes += 1
@@ -81,7 +84,6 @@ while True:
                                 break
         
         for enemy in list(enemiesOnMap):
-            # print(len(enemiesOnMap))
             enemy.sprite.draw(screen)
             enemy.move()
             enemy.new = False
@@ -89,7 +91,7 @@ while True:
             screen.blit(enemyText,(enemy.sprite.rect.x+enemyText.get_width()/2,enemy.sprite.rect.y-enemy.sprite.rect.w/3,enemyText.get_width(),basicFont.get_linesize()))
             if enemy.health <= 0:
                 enemiesOnMap.remove(enemy)
-                marbies += 50
+                marbies += 25
             for obj in grid:
                 if "color" in obj and "x" in obj and "y" in obj and "id" in obj:
                     if enemy.sprite.rect.centerx >= obj["x"] and enemy.sprite.rect.centery >= obj["y"] and enemy.sprite.rect.centerx <= obj["x"]+GRID_SIZE and enemy.sprite.rect.centery <= obj["y"]+GRID_SIZE and enemy.sprite.rect.centerx >= 0 and enemy.sprite.rect.centery >= 0 and enemy.sprite.rect.centerx <= WIDTH and enemy.sprite.rect.centery <= HEIGHT:
@@ -104,6 +106,8 @@ while True:
                                 enemy.changeSpeed(-enemy.walkSpeed,0)
                             elif obj["id"] == "3":
                                 castle_health -= enemy.health
+                                enemy.sprite.rect.x = 0
+                                enemy.sprite.rect.y = 0
                                 enemiesOnMap.remove(enemy)
 
         if castle_health <= 0:
