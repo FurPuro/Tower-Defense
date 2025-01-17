@@ -29,10 +29,12 @@ def getObjectInGrid(x,y):
                 return obj
     return None
 def generateWave(waves):
-    waveMobs = {
-        "basicZombie": math.floor(2*((waves-0.5)*2)),
-        "fastZombie": math.floor(2*(waves-1))
-    }
+    waveMobs = []
+    for i in range(0,math.floor(2*((waves-0.5)*2))):
+        waveMobs.append("basicZombie")
+    if math.floor(2*(waves-1)) > 0:
+        for i in range(0,math.floor(2*(waves-1))):
+            waveMobs.append("fastZombie")
     return waveMobs
 def lookAt(sprite,sprite2):
     rel_x, rel_y = sprite2.rect.y - sprite.rect.x, sprite2.rect.y - sprite.rect.y
