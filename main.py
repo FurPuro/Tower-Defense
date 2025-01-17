@@ -86,7 +86,7 @@ while True:
             enemy.move()
             enemy.new = False
             enemyText = basicFont.render(str(enemy.health),True,(255,0,0))
-            screen.blit(enemyText,(enemy.sprite.rect.x+enemyText.get_width(),enemy.sprite.rect.y-enemy.sprite.rect.w/3,enemyText.get_width(),basicFont.get_linesize()))
+            screen.blit(enemyText,(enemy.sprite.rect.x+enemyText.get_width()/2,enemy.sprite.rect.y-enemy.sprite.rect.w/3,enemyText.get_width(),basicFont.get_linesize()))
             if enemy.health <= 0:
                 enemiesOnMap.remove(enemy)
                 marbies += 50
