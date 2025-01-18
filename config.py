@@ -6,7 +6,7 @@ GRID_SIZE_WIDTH = GRID_SIZE/WIDTH
 GRID_SIZE_HEIGHT = GRID_SIZE/HEIGHT
 MAX_EQUIPPED_TOWERS = 5
 START_MARBIES = 250
-CASTLE_MAX_HEALTH = 25
+CASTLE_MAX_HEALTH = 50
 
 #Game global variables
 grid = []
@@ -19,6 +19,7 @@ enemies = []
 enemiesOnMap = []
 placedTowers = []
 marbies = START_MARBIES
+gold = 0
 game_state = "menu"
 hotbar_opened = False
 selected_tower = None
@@ -28,10 +29,10 @@ spawnCenterY = 0
 castle_health = CASTLE_MAX_HEALTH
 
 #Directories
-ASSETS_DIR = r"assets"
-IMAGES_DIR = r"assets\images"
-LEVELS_DIR = r"assets\levels"
-SAVES_DIR = r"assets\saves"
+ASSETS_DIR = rf"assets"
+IMAGES_DIR = rf"assets\images"
+LEVELS_DIR = rf"assets\levels"
+SAVES_DIR = rf"assets\saves"
 
 #Colors
 MENU_BG_COLOR = (59, 64, 130)

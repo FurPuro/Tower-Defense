@@ -6,6 +6,7 @@ class Enemy:
         self.sprite = Sprite(x,y,w,h,state,colorOrImagePath)
         self.speed = [0,0]
         self.walkSpeed = walkSpeed
+        self.defaultWalkSpeed = walkSpeed
         self.health = health
         self.id = id
         self.new = new

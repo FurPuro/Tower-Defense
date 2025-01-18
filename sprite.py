@@ -8,8 +8,8 @@ class Sprite:
         self.state = state
         if os.path.isfile(str(self.display)):
             self.path = colorOrImagePath
-            self.original_image = pygame.image.load(self.display)
-            self.display = pygame.image.load(self.display)
+            self.original_image = pygame.image.load(self.path)
+            self.display = pygame.image.load(self.path)
         sprites.append(self)
     def draw(self,screen):
         if type(self.display) is not tuple:  #os.path.isfile(str(self.display)):

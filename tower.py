@@ -15,3 +15,11 @@ class Tower:
         self.upgradedMaxDistance = upgradedMaxDistance
         self.upgraded = False
         towers.append(self)
+    def upgrade(self):
+        x,y,w,h,state,path = self.sprite.rect.x,self.sprite.rect.y,self.sprite.rect.w,self.sprite.rect.h,self.sprite.state,self.sprite.path
+        self.sprite = Sprite(x,y,w,h,state,path.replace(".png","Upgraded.png"))
+        self.price = self.upgradePrice
+        self.damage = self.upgradeDamage
+        self.attacksPerSecond = self.upgradedAttacksPerSecond
+        self.maxDistance = self.upgradedMaxDistance
+        self.upgraded = True

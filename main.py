@@ -2,11 +2,13 @@ import pygame
 import random
 import math
 import copy
+import os
+import sys
 from button import Button
 from tower import Tower
 from enemy import Enemy
 from config import *
-from utils import loadLevel,generateWave,lookAt
+from utils import loadLevel,generateWave,lookAt,calculateDistance
 
 pygame.init()
 
@@ -18,8 +20,12 @@ summonTimer = 0
 summonTimerNeedTimes = 0
 
 basicFont = pygame.font.SysFont("Comic Sans MS",15)
+smallBasicFont = pygame.font.SysFont("Comic Sans MS",10)
 marbiesText = basicFont.render(f"{marbies}m",True,HOTBAR_COLOR)
 healthText = basicFont.render(f"{castle_health}hp",True,HOTBAR_COLOR)
+
+background = pygame.image.load(fr"{IMAGES_DIR}\MenuBackground.png")
+background = pygame.transform.scale(background,(WIDTH,HEIGHT))
 
 playbutton = Button(WIDTH/2-240/2,HEIGHT/2-120/2,240,120,"menu",rf"{IMAGES_DIR}\playButton.png",rf"""
 grid = loadLevel()
@@ -27,12 +33,32 @@ wave = 1
 castle_health = CASTLE_MAX_HEALTH
 game_state = 'game'
 """)
+shopbutton = Button(WIDTH/2-270,HEIGHT/2-90/2,90,90,"menu",rf"{IMAGES_DIR}\shopButton.png",rf"""
+game_state = 'shop'
+""")
+returnbutton = Button(5,5,30,30,"shop",rf"{IMAGES_DIR}\returnButton.png",rf"""
+game_state = 'menu'
+""")
+returnbutton2 = Button(5,5,30,30,"saves",rf"{IMAGES_DIR}\returnButton.png",rf"""
+game_state = 'menu'
+""")
+savesbutton = Button(WIDTH/2+180,HEIGHT/2-90/2,90,90,"menu",rf"{IMAGES_DIR}\savesButton.png",rf"""
+game_state = 'saves'
+""")
+
 playbutton.sprite.display = pygame.transform.scale(playbutton.sprite.display,(playbutton.sprite.rect.w,playbutton.sprite.rect.h))
-bowTower = Tower(0,0,90,90,"none",fr"{IMAGES_DIR}\bowTurret.png",fr"{IMAGES_DIR}\arrow.png","bow0",100,150,1,2,0.8,1,180,210,False)
+shopbutton.sprite.display = pygame.transform.scale(shopbutton.sprite.display,(shopbutton.sprite.rect.w,shopbutton.sprite.rect.h))
+returnbutton.sprite.display = pygame.transform.scale(returnbutton.sprite.display,(returnbutton.sprite.rect.w,returnbutton.sprite.rect.h))
+returnbutton2.sprite.display = pygame.transform.scale(returnbutton2.sprite.display,(returnbutton2.sprite.rect.w,returnbutton2.sprite.rect.h))
+savesbutton.sprite.display = pygame.transform.scale(savesbutton.sprite.display,(savesbutton.sprite.rect.w,savesbutton.sprite.rect.h))
+
+bowTower = Tower(0,0,90,90,"none",fr"{IMAGES_DIR}\bowTurret.png",fr"{IMAGES_DIR}\arrow.png","bow",125,250,1,2,1,1.5,180,210,False)
+cannonTower = Tower(0,0,90,90,"none",fr"{IMAGES_DIR}\cannonTurret.png",fr"{IMAGES_DIR}\Core.png","cannon",200,325,4,3,2,1.25,240,300,False)
 
 towersTimer = {}
 
 equippedTowers.append(bowTower)
+equippedTowers.append(cannonTower)
 
 basicZombie = Enemy(0,0,60,60,"none",fr"{IMAGES_DIR}\basicZombie.png","basicZombie",2,13,False)
 fastZombie = Enemy(0,0,60,60,"none",fr"{IMAGES_DIR}\fastZombie.png","fastZombie",3,8,False)
@@ -41,13 +67,34 @@ heavyZombie = Enemy(0,0,60,60,"none",fr"{IMAGES_DIR}\heavyZombie.png","heavyZomb
 while True:
     if game_state == "menu":
         screen.fill(MENU_BG_COLOR)
+        screen.blit(background,(0,0))
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 for button in buttons:
-                    if button.sprite.rect.collidepoint(pygame.mouse.get_pos()[0],pygame.mouse.get_pos()[1]):
+                    if button.sprite.rect.collidepoint(pygame.mouse.get_pos()[0],pygame.mouse.get_pos()[1]) and button.sprite.state == game_state:
+                        exec(button.code)
+    elif game_state == "shop":
+        screen.fill(MENU_BG_COLOR)
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                for button in buttons:
+                    if button.sprite.rect.collidepoint(pygame.mouse.get_pos()[0],pygame.mouse.get_pos()[1]) and button.sprite.state == game_state:
+                        exec(button.code)
+    elif game_state == "saves":
+        screen.fill(MENU_BG_COLOR)
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                for button in buttons:
+                    if button.sprite.rect.collidepoint(pygame.mouse.get_pos()[0],pygame.mouse.get_pos()[1]) and button.sprite.state == game_state:
                         exec(button.code)
     elif game_state == "game":
         screen.fill(GAME_BG_COLOR)
@@ -55,6 +102,7 @@ while True:
         waveMobs = generateWave(wave)
         marbiesText = basicFont.render(f"{marbies}m",True,HOTBAR_COLOR)
         healthText = basicFont.render(f"{castle_health}hp",True,HOTBAR_COLOR)
+        goldText = basicFont.render(f"{gold}G",True,HOTBAR_COLOR)
         for tower in placedTowers:
             if f"{tower.sprite.rect.x} {tower.sprite.rect.y}" not in towersTimer:
                     towersTimer[f"{tower.sprite.rect.x} {tower.sprite.rect.y}"] = 0
@@ -67,10 +115,11 @@ while True:
         if waveTimer >= FPS*45:
             waveTimer = 0
             wave += 1
-            marbies += wave*40
+            marbies += wave*20
             summonTimer = 0
             summonTimerTimes = 0
             summonTimerNeedTimes = len(waveMobs)
+            gold += 3 * wave
         if summonTimer >= FPS/3:
             summonTimer = 0
             if summonTimerNeedTimes > 0 and summonTimerTimes < summonTimerNeedTimes:
@@ -92,6 +141,7 @@ while True:
             if enemy.health <= 0:
                 enemiesOnMap.remove(enemy)
                 marbies += 25
+                gold += 1
             for obj in grid:
                 if "color" in obj and "x" in obj and "y" in obj and "id" in obj:
                     if enemy.sprite.rect.centerx >= obj["x"] and enemy.sprite.rect.centery >= obj["y"] and enemy.sprite.rect.centerx <= obj["x"]+GRID_SIZE and enemy.sprite.rect.centery <= obj["y"]+GRID_SIZE and enemy.sprite.rect.centerx >= 0 and enemy.sprite.rect.centery >= 0 and enemy.sprite.rect.centerx <= WIDTH and enemy.sprite.rect.centery <= HEIGHT:
@@ -118,23 +168,25 @@ while True:
 
         for tower in placedTowers:
             tower.sprite.draw(screen)
-
         if towersTimer:
             for tower in placedTowers:
                 key = f"{tower.sprite.rect.x} {tower.sprite.rect.y}"
                 # print(keyTuple,value,tower.attacksPerSecond)
                 if key in towersTimer:
                     towersTimer[key] += 1
+                    targetEnemy = None
+                    maxDistance = 0
+                    for enemy in enemiesOnMap:
+                        distance = calculateDistance(tower.sprite.rect.centerx,tower.sprite.rect.centery,enemy.sprite.rect.centerx,enemy.sprite.rect.centery)
+                        if distance > maxDistance and distance <= tower.maxDistance:
+                            targetEnemy = enemy
+                            maxDistance = distance
                     if towersTimer[key] >= tower.attacksPerSecond*FPS:
                         towersTimer[key] = 0
-                        targetEnemy = None
-                        for enemy in enemiesOnMap:
-                            if enemy.sprite.rect.centerx >= tower.sprite.rect.centerx-tower.maxDistance and enemy.sprite.rect.centery >= tower.sprite.rect.centerx-tower.maxDistance and enemy.sprite.rect.centerx <= tower.sprite.rect.centerx+tower.maxDistance and enemy.sprite.rect.centery <= tower.sprite.rect.centery+tower.maxDistance:
-                                targetEnemy = enemy
-                                break
                         if targetEnemy != None:
-                            # lookAt(tower.sprite,targetEnemy.sprite)
                             targetEnemy.health -= tower.damage
+                    if targetEnemy != None:
+                        lookAt(tower.sprite,targetEnemy.sprite)
 
         if hotbar_opened == True:
             pygame.draw.rect(screen,HOTBAR_COLOR,(0,0,WIDTH,GRID_SIZE*3))
@@ -143,13 +195,22 @@ while True:
                     tower.sprite.rect.x = i*90
                     tower.sprite.rect.y = 0
                     tower.sprite.draw(screen)
+                    text1 = smallBasicFont.render(f"PRC: {tower.price} > {tower.upgradePrice}",True,(0,255,255))
+                    text2 = smallBasicFont.render(f"DMG: {tower.damage} > {tower.upgradeDamage}",True,(0,255,255))
+                    text3 = smallBasicFont.render(f"ATKSPD: {tower.attacksPerSecond} > {tower.upgradedAttacksPerSecond}",True,(0,255,255))
+                    text4 = smallBasicFont.render(f"DST: {tower.maxDistance} > {tower.upgradedMaxDistance}",True,(0,255,255))
+                    screen.blit(text1, (tower.sprite.rect.x,tower.sprite.rect.y+tower.sprite.rect.h+smallBasicFont.get_linesize()*0,text1.get_rect().w,text1.get_rect().h))
+                    screen.blit(text2, (tower.sprite.rect.x,tower.sprite.rect.y+tower.sprite.rect.h+smallBasicFont.get_linesize()*1,text2.get_rect().w,text2.get_rect().h))
+                    screen.blit(text3, (tower.sprite.rect.x,tower.sprite.rect.y+tower.sprite.rect.h+smallBasicFont.get_linesize()*2,text3.get_rect().w,text3.get_rect().h))
+                    screen.blit(text4, (tower.sprite.rect.x,tower.sprite.rect.y+tower.sprite.rect.h+smallBasicFont.get_linesize()*3,text4.get_rect().w,text4.get_rect().h))
         screen.blit(marbiesText, (0,HEIGHT-basicFont.get_linesize(),marbiesText.get_rect().w,marbiesText.get_rect().h))
-        screen.blit(healthText, (0,HEIGHT-basicFont.get_linesize()*2,marbiesText.get_rect().w,marbiesText.get_rect().h))
+        screen.blit(healthText, (0,HEIGHT-basicFont.get_linesize()*2,healthText.get_rect().w,healthText.get_rect().h))
+        screen.blit(goldText, (0,HEIGHT-basicFont.get_linesize()*3,goldText.get_rect().w,goldText.get_rect().h))
         for event in pygame.event.get():
+            mx,my = pygame.mouse.get_pos()
             if event.type == pygame.QUIT:
                 pygame.quit()
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                mx,my = pygame.mouse.get_pos()
                 for tower in equippedTowers:
                     if tower.sprite.rect.collidepoint(mx,my):
                         selected_tower = Tower(tower.sprite.rect.x,tower.sprite.rect.y,tower.sprite.rect.w,tower.sprite.rect.h,tower.sprite.state,tower.sprite.path,tower.projectileSprite,tower.id,tower.price,tower.upgradePrice,tower.damage,tower.upgradeDamage,tower.attacksPerSecond,tower.upgradedAttacksPerSecond,tower.maxDistance,tower.upgradedMaxDistance,False)
@@ -183,6 +244,13 @@ while True:
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_TAB:
                     hotbar_opened = True
+                elif event.key == pygame.K_e:
+                    for tower in placedTowers:
+                        if tower.sprite.rect.collidepoint(mx,my):
+                            # print(mx,my,tower.sprite.rect)
+                            if tower.upgraded == False and marbies >= tower.upgradePrice:
+                                marbies -= tower.upgradePrice
+                                tower.upgrade()
                 # elif event.key == pygame.K_x:
                 #     for tower in list(placedTowers):
                 #         if tower.sprite.rect.collidepoint(mx,my):
