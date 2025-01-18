@@ -31,12 +31,13 @@ def getObjectInGrid(x,y):
     return None
 def generateWave(waves):
     waveMobs = []
-    basicZombies = round(1.7*waves)
-    fastZombies = round(1.5*waves)
-    heavyZombies = round(1.45*waves)
+    basicZombies = round(1.3*waves)
+    fastZombies = round(0.9*waves)
+    heavyZombies = round(0.8*waves)
+    basicBossZombies = round(waves/10)
     if waves > 1:
         if basicZombies > 0:
-            for i in range(1,round(1.7*waves)):
+            for i in range(1,basicZombies):
                 waveMobs.append("basicZombie")
         if fastZombies > 0:
             for i in range(1,fastZombies):
@@ -47,6 +48,9 @@ def generateWave(waves):
     else:
         for i in range(0,round(2*1)):
             waveMobs.append("basicZombie")
+    if waves != 1 and waves % 10 == 0:
+        for i in range(1,basicBossZombies):
+            waveMobs.append("basicBossZombie")
     random.shuffle(waveMobs)
     return waveMobs
 def lookAt(sprite,sprite2):

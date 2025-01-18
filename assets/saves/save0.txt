@@ -1,2 +1,4 @@
-0
+6
 0,0,90,90,none,assets\images\bowTurret.png,assets\images\arrow.png,bow,125.0,250.0,1.0,2.0,1.0,1.5,180.0,210.0,[]
+90,0,90,90,none,assets\images\cannonTurret.png,assets\images\Core.png,cannon,200.0,325.0,4.0,3.0,2.0,1.25,240.0,300.0,[]
+180,0,90,90,none,assets\images\piqueTurret.png,assets\images\None.png,pique,150.0,275.0,0.5,1.0,0.25,0.5,100.0,120.0,[]
