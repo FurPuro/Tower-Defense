@@ -8,6 +8,7 @@ from button import Button
 from tower import Tower
 from enemy import Enemy
 from config import *
+from itertools import chain
 from utils import loadLevel,generateWave,lookAt,calculateDistance
 
 pygame.init()
@@ -52,19 +53,59 @@ returnbutton.sprite.display = pygame.transform.scale(returnbutton.sprite.display
 returnbutton2.sprite.display = pygame.transform.scale(returnbutton2.sprite.display,(returnbutton2.sprite.rect.w,returnbutton2.sprite.rect.h))
 savesbutton.sprite.display = pygame.transform.scale(savesbutton.sprite.display,(savesbutton.sprite.rect.w,savesbutton.sprite.rect.h))
 
-bowTower = Tower(0,0,90,90,"none",fr"{IMAGES_DIR}\bowTurret.png",fr"{IMAGES_DIR}\arrow.png","bow",125,250,1,2,1,1.5,180,210,False)
-cannonTower = Tower(0,0,90,90,"none",fr"{IMAGES_DIR}\cannonTurret.png",fr"{IMAGES_DIR}\Core.png","cannon",200,325,4,3,2,1.25,240,300,False)
+bowTower = Tower(0,0,90,90,"none",fr"{IMAGES_DIR}\bowTurret.png",fr"{IMAGES_DIR}\arrow.png","bow",125,250,1,2,1,1.5,180,210,[])
+cannonTower = Tower(0,0,90,90,"none",fr"{IMAGES_DIR}\cannonTurret.png",fr"{IMAGES_DIR}\Core.png","cannon",200,325,4,3,2,1.25,240,300,[])
 
 towersTimer = {}
 
-equippedTowers.append(bowTower)
-equippedTowers.append(cannonTower)
+save = open(fr"{SAVES_DIR}\save0.txt","r+")
+saveLines = save.readlines()
+if saveLines:
+    if saveLines[0] and saveLines[0] != "":
+        gold = int(saveLines[0])
+    else:
+        gold = 0
+    if saveLines[1] and saveLines[1] != "":
+        readedTower = [] 
+        for line in saveLines:
+            if line != saveLines[0]:
+                for index,tower in enumerate(line.split(",")):
+                    add = tower
+                    if index == 0 or index == 1 or index == 2 or index == 3 or (index >= 8 and index < 16):
+                        add = float(tower)
+                    elif index == 16:
+                        add = []
+                    readedTower.append(add)
+        equippedTowers.append(Tower(*readedTower))
+    else:
+        equippedTowers.append(bowTower)
+else:
+    gold = 0
+    equippedTowers.append(bowTower)
+    # saveList = ["0\n"]
+    # for tower in equippedTowers:
+    #     saveList.append(f"{tower.sprite.rect.x},{tower.sprite.rect.y},{tower.sprite.rect.w},{tower.sprite.rect.h},{tower.sprite.path},{tower.projectileSprite.path},{tower.id},{tower.price},{tower.upgradePrice},{tower.damage},{tower.upgradeDamage},{tower.attacksPerSecond},{tower.upgradedAttacksPerSecond},{tower.maxDistance},{tower.upgradedMaxDistance},{tower.territories}\n")
+    # save.writelines(saveList)
+save.close()
 
 basicZombie = Enemy(0,0,60,60,"none",fr"{IMAGES_DIR}\basicZombie.png","basicZombie",2,13,False)
 fastZombie = Enemy(0,0,60,60,"none",fr"{IMAGES_DIR}\fastZombie.png","fastZombie",3,8,False)
 heavyZombie = Enemy(0,0,60,60,"none",fr"{IMAGES_DIR}\heavyZombie.png","heavyZombie",1,40,False)
 
 while True:
+    save = open(fr"{SAVES_DIR}\save0.txt","w")
+    saveList = ["0\n"]
+    if equippedTowers:
+        for tower in equippedTowers:
+            saveList.append(f"{tower.sprite.rect.x},{tower.sprite.rect.y},{tower.sprite.rect.w},{tower.sprite.rect.h},{tower.sprite.state},{tower.sprite.path},{tower.projectileSprite.path},{tower.id},{tower.price},{tower.upgradePrice},{tower.damage},{tower.upgradeDamage},{tower.attacksPerSecond},{tower.upgradedAttacksPerSecond},{tower.maxDistance},{tower.upgradedMaxDistance},{tower.territories}\n")
+    else:
+        equippedTowers.append(bowTower)
+        for tower in equippedTowers:
+            saveList.append(f"{tower.sprite.rect.x},{tower.sprite.rect.y},{tower.sprite.rect.w},{tower.sprite.rect.h},{tower.sprite.state},{tower.sprite.path},{tower.projectileSprite.path},{tower.id},{tower.price},{tower.upgradePrice},{tower.damage},{tower.upgradeDamage},{tower.attacksPerSecond},{tower.upgradedAttacksPerSecond},{tower.maxDistance},{tower.upgradedMaxDistance},{tower.territories}\n")
+        
+    save.writelines(saveList)
+    save.close()
+
     if game_state == "menu":
         screen.fill(MENU_BG_COLOR)
         screen.blit(background,(0,0))
@@ -78,7 +119,9 @@ while True:
                         exec(button.code)
     elif game_state == "shop":
         screen.fill(MENU_BG_COLOR)
-
+        goldText = basicFont.render(f"{gold}G",True,(0,255,0))
+        
+        screen.blit(goldText, (0,HEIGHT-basicFont.get_linesize()*1,goldText.get_rect().w,goldText.get_rect().h))
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -100,7 +143,7 @@ while True:
         screen.fill(GAME_BG_COLOR)
         waveMobs = None
         waveMobs = generateWave(wave)
-        marbiesText = basicFont.render(f"{marbies}m",True,HOTBAR_COLOR)
+        marbiesText = basicFont.render(f"{round(marbies,1)}m",True,HOTBAR_COLOR)
         healthText = basicFont.render(f"{castle_health}hp",True,HOTBAR_COLOR)
         goldText = basicFont.render(f"{gold}G",True,HOTBAR_COLOR)
         for tower in placedTowers:
@@ -213,7 +256,7 @@ while True:
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 for tower in equippedTowers:
                     if tower.sprite.rect.collidepoint(mx,my):
-                        selected_tower = Tower(tower.sprite.rect.x,tower.sprite.rect.y,tower.sprite.rect.w,tower.sprite.rect.h,tower.sprite.state,tower.sprite.path,tower.projectileSprite,tower.id,tower.price,tower.upgradePrice,tower.damage,tower.upgradeDamage,tower.attacksPerSecond,tower.upgradedAttacksPerSecond,tower.maxDistance,tower.upgradedMaxDistance,False)
+                        selected_tower = Tower(tower.sprite.rect.x,tower.sprite.rect.y,tower.sprite.rect.w,tower.sprite.rect.h,tower.sprite.state,tower.sprite.path,tower.projectileSprite,tower.id,tower.price,tower.upgradePrice,tower.damage,tower.upgradeDamage,tower.attacksPerSecond,tower.upgradedAttacksPerSecond,tower.maxDistance,tower.upgradedMaxDistance,tower.territories)
                 if selected_tower != None and hotbar_opened == False:
                     for obj in grid:
                         if "color" in obj and "x" in obj and "y" in obj and "id" in obj:
@@ -229,15 +272,17 @@ while True:
 
                                 if goodPlace == True and marbies >= selected_tower.price:
                                     marbies -= selected_tower.price
+                                    territories = []
                                     for x in range(-GRID_SIZE,GRID_SIZE*2,GRID_SIZE):
                                         for y in range(-GRID_SIZE,GRID_SIZE*2,GRID_SIZE):
                                             for obj2 in grid:
                                                 if "color" in obj2 and "x" in obj2 and "y" in obj2 and "id" in obj2:
                                                     if obj["x"]+x == obj2["x"] and obj["y"]+y == obj2["y"] and obj["x"]+x >= 0 and obj["y"]+y >= 0 and obj["x"]+x <= WIDTH and obj["y"]+y <= HEIGHT:
                                                         obj2["id"] = "4"
+                                                        territories.append(obj2)
                                                         obj2["color"] = (GAME_BG_COLOR[0]-10,GAME_BG_COLOR[1]-10,GAME_BG_COLOR[2]-10)
 
-                                    placedTower = Tower(selected_tower.sprite.rect.x,selected_tower.sprite.rect.y,selected_tower.sprite.rect.w,selected_tower.sprite.rect.h,selected_tower.sprite.state,selected_tower.sprite.path,selected_tower.projectileSprite,selected_tower.id,selected_tower.price,selected_tower.upgradePrice,selected_tower.damage,selected_tower.upgradeDamage,selected_tower.attacksPerSecond,selected_tower.upgradedAttacksPerSecond,selected_tower.maxDistance,selected_tower.upgradedMaxDistance,False)
+                                    placedTower = Tower(selected_tower.sprite.rect.x,selected_tower.sprite.rect.y,selected_tower.sprite.rect.w,selected_tower.sprite.rect.h,selected_tower.sprite.state,selected_tower.sprite.path,selected_tower.projectileSprite,selected_tower.id,selected_tower.price,selected_tower.upgradePrice,selected_tower.damage,selected_tower.upgradeDamage,selected_tower.attacksPerSecond,selected_tower.upgradedAttacksPerSecond,selected_tower.maxDistance,selected_tower.upgradedMaxDistance,territories)
                                     placedTower.sprite.rect.x = obj["x"]-GRID_SIZE
                                     placedTower.sprite.rect.y = obj["y"]-GRID_SIZE
                                     placedTowers.append(placedTower)                                           
@@ -251,28 +296,20 @@ while True:
                             if tower.upgraded == False and marbies >= tower.upgradePrice:
                                 marbies -= tower.upgradePrice
                                 tower.upgrade()
-                # elif event.key == pygame.K_x:
-                #     for tower in list(placedTowers):
-                #         if tower.sprite.rect.collidepoint(mx,my):
-                #             if tower.upgraded == True:
-                #                 marbies += tower.upgradePrice/2
-                #             else:
-                #                 marbies += tower.price/2
-                #             for obj in grid:
-                #                 if "color" in obj and "x" in obj and "y" in obj and "id" in obj:
-                #                     if mx >= obj["x"] and my >= obj["y"] and mx <= obj["x"]+GRID_SIZE and my <= obj["y"]+GRID_SIZE:
-                #                         for x in range(-GRID_SIZE,GRID_SIZE*2,GRID_SIZE):
-                #                             for y in range(-GRID_SIZE,GRID_SIZE*2,GRID_SIZE):
-                #                                 print(x,y)
-                #                                 for obj2 in grid:
-                #                                     if "color" in obj2 and "x" in obj2 and "y" in obj2 and "id" in obj2:
-                #                                         if obj["id"] == "4" and tower.sprite.rect.x+GRID_SIZE+x == obj2["x"] and tower.sprite.rect.y+GRID_SIZE+y == obj2["y"] and tower.sprite.rect.x+GRID_SIZE+x >= 0 and tower.sprite.rect.y+GRID_SIZE+y >= 0 and tower.sprite.rect.x+GRID_SIZE+x <= WIDTH and tower.sprite.rect.y+GRID_SIZE+y <= HEIGHT:
-                #                                             obj2["id"] = "0"
-                #                                             obj2["color"] = GAME_BG_COLOR
-                #             placedTowers.remove(tower)
+                elif event.key == pygame.K_x:
+                    for tower in list(placedTowers):
+                        if tower.sprite.rect.collidepoint(mx,my):
+                            marbies += tower.price/1.75
+                            for obj in grid:
+                                for terObj in tower.territories:
+                                    if obj == terObj:
+                                        obj["id"] = "0"
+                                        obj["color"] = (GAME_BG_COLOR[0]+random.randint(-2,2),GAME_BG_COLOR[1]+random.randint(-2,2),GAME_BG_COLOR[2]+random.randint(-2,2))
+                            placedTowers.remove(tower)
             elif event.type == pygame.KEYUP:
                 if event.key == pygame.K_TAB:
                     hotbar_opened = False
+
 
     for sprite in sprites:
         if sprite.state == game_state:
