@@ -168,9 +168,10 @@ dist/main/assets/images/staffTurret.png
 dist/main/assets/images/staffTurretUpgraded.png
 dist/main/assets/levels/lvl1.txt
 dist/main/assets/saves/save0.txt
-__pycache__/button.cpython-313.pyc
-__pycache__/config.cpython-313.pyc
-__pycache__/enemy.cpython-313.pyc
-__pycache__/sprite.cpython-313.pyc
-__pycache__/tower.cpython-313.pyc
-__pycache__/utils.cpython-313.pyc
+dist/__pycache__/button.cpython-313.pyc
+dist/__pycache__/config.cpython-313.pyc
+dist/__pycache__/enemy.cpython-313.pyc
+dist/__pycache__/sprite.cpython-313.pyc
+dist/__pycache__/tower.cpython-313.pyc
+dist/__pycache__/utils.cpython-313.pyc
+dist/Tower-Defense_V0.4.rar
