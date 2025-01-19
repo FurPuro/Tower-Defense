@@ -36,6 +36,7 @@ marbies = START_MARBIES
 summonTimerTimes = 0
 summonTimer = 0
 summonTimerNeedTimes = 0
+projectiles.clear()
 waveTimer = FPS*40
 castle_health = CASTLE_MAX_HEALTH
 game_state = 'game'
@@ -106,7 +107,7 @@ save.close()
 basicZombie = Enemy(0,0,60,60,"none",fr"{IMAGES_DIR}\basicZombie.png","basicZombie",2,13,False)
 fastZombie = Enemy(0,0,60,60,"none",fr"{IMAGES_DIR}\fastZombie.png","fastZombie",3,8,False)
 heavyZombie = Enemy(0,0,60,60,"none",fr"{IMAGES_DIR}\heavyZombie.png","heavyZombie",1,40,False)
-basicBossZombie = Enemy(0,0,90,90,"none",fr"{IMAGES_DIR}\basicBossZombie.png","basicBossZombie",1,120,False)
+basicBossZombie = Enemy(0,0,90,90,"none",fr"{IMAGES_DIR}\basicBossZombie.png","basicBossZombie",2,120,False)
 
 while True:
     save = open(fr"{SAVES_DIR}\save0.txt","w")
