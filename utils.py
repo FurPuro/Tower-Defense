@@ -54,9 +54,14 @@ def generateWave(waves):
     random.shuffle(waveMobs)
     return waveMobs
 def lookAt(sprite,sprite2):
-    rel_x, rel_y = sprite2.rect.x - sprite.rect.x, sprite2.rect.y - sprite.rect.y
+    rel_x, rel_y = sprite2.rect.centerx - sprite.rect.centerx, sprite2.rect.centery - sprite.rect.centery
     angle = (180 / math.pi) * -math.atan2(rel_y, rel_x)
     sprite.display = pygame.transform.rotate(sprite.original_image, int(angle+180))
+    sprite.rect = sprite.display.get_rect(center=sprite.rect.center)
+def projectileLookAt(sprite,sprite2):
+    rel_x, rel_y = sprite2.rect.centerx - sprite.rect.centerx, sprite2.rect.centery - sprite.rect.centery
+    angle = (180 / math.pi) * -math.atan2(rel_y, rel_x)
+    sprite.display = pygame.transform.rotate(sprite.original_image, int(angle-90))
     sprite.rect = sprite.display.get_rect(center=sprite.rect.center)
 def calculateDistance(x1,y1,x2,y2):
     dx = x2-x1
