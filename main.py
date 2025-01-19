@@ -130,6 +130,7 @@ while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
+                quit()
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 for button in buttons:
                     if button.sprite.rect.collidepoint(pygame.mouse.get_pos()[0],pygame.mouse.get_pos()[1]) and button.sprite.state == game_state:
@@ -165,6 +166,7 @@ while True:
             mx,my = pygame.mouse.get_pos()
             if event.type == pygame.QUIT:
                 pygame.quit()
+                quit()
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 for button in buttons:
                     if button.sprite.rect.collidepoint(pygame.mouse.get_pos()[0],pygame.mouse.get_pos()[1]) and button.sprite.state == game_state:
@@ -210,6 +212,7 @@ while True:
             mx,my = pygame.mouse.get_pos()
             if event.type == pygame.QUIT:
                 pygame.quit()
+                quit()
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 for button in buttons:
                     if button.sprite.rect.collidepoint(pygame.mouse.get_pos()[0],pygame.mouse.get_pos()[1]) and button.sprite.state == game_state:
@@ -263,7 +266,7 @@ while True:
                 gold += 1
             for obj in grid:
                 if "color" in obj and "x" in obj and "y" in obj and "id" in obj:
-                    if pygame.rect.Rect(enemy.sprite.rect.centerx,enemy.sprite.rect.centery,1,1).collidepoint(obj["x"]+GRID_SIZE/2,obj["y"]+GRID_SIZE/2): # enemy.sprite.rect.centerx >= obj["x"]+GRID_SIZE/2 and enemy.sprite.rect.centery >= obj["y"]+GRID_SIZE/2 and enemy.sprite.rect.centerx <= obj["x"]+GRID_SIZE and enemy.sprite.rect.centery <= obj["y"]+GRID_SIZE and enemy.sprite.rect.centerx >= 0 and enemy.sprite.rect.centery >= 0 and enemy.sprite.rect.centerx <= WIDTH and enemy.sprite.rect.centery <= HEIGHT:
+                    if pygame.rect.Rect(enemy.sprite.rect.centerx-3,enemy.sprite.rect.centery-3,4,4).collidepoint(obj["x"]+GRID_SIZE/2,obj["y"]+GRID_SIZE/2): # enemy.sprite.rect.centerx >= obj["x"]+GRID_SIZE/2 and enemy.sprite.rect.centery >= obj["y"]+GRID_SIZE/2 and enemy.sprite.rect.centerx <= obj["x"]+GRID_SIZE and enemy.sprite.rect.centery <= obj["y"]+GRID_SIZE and enemy.sprite.rect.centerx >= 0 and enemy.sprite.rect.centery >= 0 and enemy.sprite.rect.centerx <= WIDTH and enemy.sprite.rect.centery <= HEIGHT:
                         if obj != None:
                             if obj["id"] == "5":
                                 enemy.changeSpeed(enemy.walkSpeed,0)
@@ -370,7 +373,12 @@ while True:
                                     maxWS = enemy.walkSpeed
                             if targetEnemy != None:
                                 towersTimer[key] = 0
-                                targetEnemy.health -= tower.damage
+                                if tower.id == "cannon":
+                                    for enemy in enemies:
+                                        if enemy.sprite.rect.colliderect(targetEnemy.sprite.rect.x-60,targetEnemy.sprite.rect.y-60,targetEnemy.sprite.rect.x+60,targetEnemy.sprite.rect.y+60):
+                                            enemy.health -= tower.damage
+                                else:
+                                    targetEnemy.health -= tower.damage
                                 if tower.id == "pique" and tower.upgraded == True:
                                     slownessTimer[targetEnemy] = 0
                                 if projectile not in projectiles:
@@ -409,6 +417,7 @@ while True:
             mx,my = pygame.mouse.get_pos()
             if event.type == pygame.QUIT:
                 pygame.quit()
+                quit()
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 for tower in equippedTowers:
                     if tower.sprite.rect.collidepoint(mx,my) and hotbar_opened == True:

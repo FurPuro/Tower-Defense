@@ -1,2 +1,0 @@
-7315
-0,0,90,90,none,assets\images\bowTurret.png,assets\images\arrow.png,bow,125.0,250.0,1.0,2.0,1.0,1.5,180.0,240.0,[]
