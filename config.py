@@ -6,7 +6,8 @@ GRID_SIZE_WIDTH = GRID_SIZE/WIDTH
 GRID_SIZE_HEIGHT = GRID_SIZE/HEIGHT
 MAX_EQUIPPED_TOWERS = 5
 START_MARBIES = 250
-CASTLE_MAX_HEALTH = 1
+CASTLE_MAX_HEALTH = 40
+MAX_TOWERS = 15
 
 #Game global variables
 grid = []
@@ -27,6 +28,8 @@ wave = 0
 spawnCenterX = 0
 spawnCenterY = 0
 castle_health = CASTLE_MAX_HEALTH
+grass_color = (0,0,0)
+way_color = (0,0,0)
 
 #Directories
 ASSETS_DIR = rf"assets"
@@ -41,3 +44,4 @@ PLAY_BUTTON_COLOR = (180,0,0)
 WAY_COLOR = (133,122,100)
 CASTLE_COLOR = (181,191,187)
 HOTBAR_COLOR = (76,76,76)
+WHITE = (255,255,255)

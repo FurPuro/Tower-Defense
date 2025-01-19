@@ -1,5 +1,5 @@
 from sprite import Sprite
-from config import GRID_SIZE,enemies,grid,WIDTH,HEIGHT
+from config import enemies
 from pygame.transform import rotate
 class Enemy:
     def __init__(self,x,y,w,h,state,colorOrImagePath,id,walkSpeed,health,new):
