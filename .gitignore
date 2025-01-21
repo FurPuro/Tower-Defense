@@ -175,3 +175,10 @@ __pycache__/sprite.cpython-313.pyc
 __pycache__/tower.cpython-313.pyc
 __pycache__/utils.cpython-313.pyc
 dist/Tower-Defense_V0.4.rar
+dist/Tower-Defense_V0.5.rar
+build.bat
+test.bat
+main.spec
+__pycache__/config.cpython-313.pyc
+__pycache__/tower.cpython-313.pyc
+__pycache__/utils.cpython-313.pyc

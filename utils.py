@@ -31,30 +31,37 @@ def getObjectInGrid(x,y):
                 return obj
     return None
 def generateWave(waves):
-    waveMobs = []
-    basicZombies = round(1.3*waves)
-    fastZombies = round(0.9*waves)
-    heavyZombies = round(0.8*waves)
+    global waveTen
+    print(waves,waveTen)
+    for enemy in enemies:
+        if waveTen > 1 and enemy not in enemiesOnMap:
+            enemy.health += enemy.health/2.5
+    if waves % 10 == 0 and waves > 1:
+        waveTen += 1
+    waveMobsGen = []
+    basicZombies = round(1.3*(waves/waveTen))
+    fastZombies = round(0.9*(waves/waveTen))
+    heavyZombies = round(0.8*(waves/waveTen))
     basicBossZombies = math.floor((waves+5)/10)
     if waves > 1:
         if basicZombies > 0:
             for i in range(1,basicZombies):
-                waveMobs.append("basicZombie")
+                waveMobsGen.append("basicZombie")
         if fastZombies > 0:
             for i in range(1,fastZombies):
-                waveMobs.append("fastZombie")
+                waveMobsGen.append("fastZombie")
         if heavyZombies > 0:
             for i in range(1,heavyZombies):
-                waveMobs.append("heavyZombie")
+                waveMobsGen.append("heavyZombie")
     else:
         for i in range(0,2):
-            waveMobs.append("basicZombie")
+            waveMobsGen.append("basicZombie")
     if waves % 10 == 0:
     # if waves == 10 or waves == 20 or waves == 30 or waves == 40 or waves == 50 or waves == 60 or waves == 70 or waves == 80 or waves == 90 or waves == 100:
         for i in range(0,basicBossZombies):
-            waveMobs.append("basicBossZombie")
-    random.shuffle(waveMobs)
-    return waveMobs
+            waveMobsGen.append("basicBossZombie")
+    random.shuffle(waveMobsGen)
+    return waveMobsGen
 def lookAt(sprite,sprite2):
     rel_x, rel_y = sprite2.rect.centerx - sprite.rect.centerx, sprite2.rect.centery - sprite.rect.centery
     angle = (180 / math.pi) * -math.atan2(rel_y, rel_x)

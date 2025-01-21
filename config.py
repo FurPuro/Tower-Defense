@@ -25,6 +25,7 @@ game_state = "menu"
 hotbar_opened = False
 selected_tower = None
 wave = 0
+waveTen = 1.0
 spawnCenterX = 0
 spawnCenterY = 0
 castle_health = CASTLE_MAX_HEALTH
