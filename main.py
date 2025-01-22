@@ -4,6 +4,7 @@ from button import Button
 from tower import Tower
 from enemy import Enemy
 from config import *
+import os
 import math
 from utils import loadLevel,generateWave,lookAt,calculateDistance,projectileLookAt,rotate
 
@@ -28,11 +29,9 @@ infoText7 = largeBasicFont.render("R - Skip wave",True,(150,150,150))
 
 background = pygame.image.load(fr"{IMAGES_DIR}\MenuBackground.png")
 background = pygame.transform.scale(background,(WIDTH,HEIGHT))
-
 playbutton = Button(WIDTH/2-240/2,HEIGHT/2-120/2,240,120,"menu",rf"{IMAGES_DIR}\playButton.png",rf"""
 grid = loadLevel()
 wave = 0
-marbies = START_MARBIES
 summonTimerTimes = 0
 summonTimer = 0
 summonTimerNeedTimes = 0
@@ -62,14 +61,14 @@ infobutton.sprite.display = pygame.transform.scale(infobutton.sprite.display,(in
 
 bowTower = Tower(0,0,90,90,"none",fr"{IMAGES_DIR}\bowTurret.png",fr"{IMAGES_DIR}\arrow.png","bow",125,250,1,2,1.2,1.7,270,360,[],0,0)
 cannonTower = Tower(0,0,90,90,"none",fr"{IMAGES_DIR}\cannonTurret.png",fr"{IMAGES_DIR}\core.png","cannon",200,325,4,3,2,1.25,180,270,[],45,1200)
-piqueTower = Tower(0,0,90,90,"none",fr"{IMAGES_DIR}\piqueTurret.png",fr"{IMAGES_DIR}\piqueProjectile.png","pique",150,275,0.5,1,0.75,1,90,120,[],0,1000)
+piqueTower = Tower(0,0,90,90,"none",fr"{IMAGES_DIR}\piqueTurret.png",fr"{IMAGES_DIR}\piqueProjectile.png","pique",150,275,0.5,1,0.75,1,90,120,[],10,1000)
 staffTower = Tower(0,0,90,90,"none",fr"{IMAGES_DIR}\staffTurret.png",fr"{IMAGES_DIR}\magicalProjectile.png","staff",230,400,3,4,1.8,1.7,210,300,[],0,1800)
 farmTower = Tower(0,0,90,90,"none",fr"{IMAGES_DIR}\farmTurret.png",fr"{IMAGES_DIR}\none.png","farm",100,300,0,0,8,7,0,0,[],0,2000)
 
 towersTimer = {}
 projectiles = {}
 slownessTimer = {}
-
+prevEnemiesSpeed = {}
 shopTowers = []
 
 for tower in towers:
@@ -220,7 +219,7 @@ while True:
             summonTimer = 0
             summonTimerTimes = 0
             summonTimerNeedTimes = len(waveMobs)
-            gold += 8 * wave
+            gold += round(4*(wave*1.5))
         if summonTimer >= FPS/3:
             summonTimer = 0
             if summonTimerNeedTimes > 0 and summonTimerTimes < summonTimerNeedTimes:
@@ -237,27 +236,45 @@ while True:
             enemy.sprite.draw(screen)
             enemy.move()
             enemy.new = False
+            enemySpeedX = 0
+            enemySpeedY = 0
+            if enemy.speed[0] != 0:
+                if enemy.speed[0] > 0:
+                    enemySpeedX = enemy.defaultWalkSpeed*speedMultiplier
+                else:
+                    enemySpeedX = enemy.defaultWalkSpeed*-speedMultiplier
+            if enemy.speed[1] != 0:
+                if enemy.speed[1] > 0:
+                    enemySpeedY = enemy.defaultWalkSpeed*speedMultiplier
+                else:
+                    enemySpeedY = enemy.defaultWalkSpeed*-speedMultiplier
+            if enemy in dict(prevEnemiesSpeed) and speedMultiplier != 0:
+                enemySpeedX = prevEnemiesSpeed[enemy][0]
+                enemySpeedY = prevEnemiesSpeed[enemy][1]
+                prevEnemiesSpeed.pop(enemy)
+            enemy.changeSpeed(enemySpeedX,enemySpeedY)
             enemyText = basicFont.render(str(round(enemy.health)),True,(255,0,0))
             screen.blit(enemyText,(enemy.sprite.rect.x+enemyText.get_width()/2,enemy.sprite.rect.y-enemy.sprite.rect.w/3,enemyText.get_width(),basicFont.get_linesize()))
             if enemy.health <= 0:
                 enemiesOnMap.remove(enemy)
                 marbies += 25
-                gold += 5
+                gold += 2
             for obj in grid:
                 if "color" in obj and "x" in obj and "y" in obj and "id" in obj:
-                    if pygame.rect.Rect(enemy.sprite.rect.centerx-3,enemy.sprite.rect.centery-3,4,4).collidepoint(obj["x"]+GRID_SIZE/2,obj["y"]+GRID_SIZE/2): # enemy.sprite.rect.centerx >= obj["x"]+GRID_SIZE/2 and enemy.sprite.rect.centery >= obj["y"]+GRID_SIZE/2 and enemy.sprite.rect.centerx <= obj["x"]+GRID_SIZE and enemy.sprite.rect.centery <= obj["y"]+GRID_SIZE and enemy.sprite.rect.centerx >= 0 and enemy.sprite.rect.centery >= 0 and enemy.sprite.rect.centerx <= WIDTH and enemy.sprite.rect.centery <= HEIGHT:
+                    enemyHitbox = pygame.rect.Rect(enemy.sprite.rect.centerx-(5*speedMultiplier),enemy.sprite.rect.centery-(5*speedMultiplier),5*speedMultiplier+1,5*speedMultiplier+1)
+                    if enemyHitbox.collidepoint(obj["x"]+GRID_SIZE/2,obj["y"]+GRID_SIZE/2): # enemy.sprite.rect.centerx >= obj["x"]+GRID_SIZE/2 and enemy.sprite.rect.centery >= obj["y"]+GRID_SIZE/2 and enemy.sprite.rect.centerx <= obj["x"]+GRID_SIZE and enemy.sprite.rect.centery <= obj["y"]+GRID_SIZE and enemy.sprite.rect.centerx >= 0 and enemy.sprite.rect.centery >= 0 and enemy.sprite.rect.centerx <= WIDTH and enemy.sprite.rect.centery <= HEIGHT:
                         if obj != None:
                             if obj["id"] == "5":
-                                enemy.changeSpeed(enemy.walkSpeed,0)
+                                enemy.changeSpeed(enemy.defaultWalkSpeed*speedMultiplier,0)
                                 rotate(enemy.sprite,90)
                             elif obj["id"] == "6":
-                                enemy.changeSpeed(0,enemy.walkSpeed)
+                                enemy.changeSpeed(0,enemy.defaultWalkSpeed*speedMultiplier)
                                 rotate(enemy.sprite,0)
                             elif obj["id"] == "7":
-                                enemy.changeSpeed(0,-enemy.walkSpeed)
+                                enemy.changeSpeed(0,-enemy.defaultWalkSpeed*speedMultiplier)
                                 rotate(enemy.sprite,180)
                             elif obj["id"] == "8":
-                                enemy.changeSpeed(-enemy.walkSpeed,0)
+                                enemy.changeSpeed(-enemy.defaultWalkSpeed*speedMultiplier,0)
                                 rotate(enemy.sprite,-90)
                             elif obj["id"] == "3":
                                 castle_health -= enemy.health
@@ -268,34 +285,35 @@ while True:
         if castle_health <= 0:
             enemiesOnMap.clear()
             placedTowers.clear()
+            speedMultiplier = 1
             game_state = "menu"
 
-        waveTimer += 1
-        summonTimer += 1
+        waveTimer += 1*speedMultiplier
+        summonTimer += 1*speedMultiplier
 
         if slownessTimer:
             for enemy in enemiesOnMap:
                 if enemy in slownessTimer:
-                    slownessTimer[enemy] += 1
+                    slownessTimer[enemy] += 1*speedMultiplier
                     if enemy.speed[0] == 0 and enemy.speed[1] != 0:
                         if enemy.speed[1] > 0:
-                            enemy.changeSpeed(0,enemy.defaultWalkSpeed-1/enemy.speed[1]*enemy.speed[1])
+                            enemy.changeSpeed(0,enemy.defaultWalkSpeed-1/enemy.speed[1]*enemy.speed[1]*speedMultiplier)
                         else:
-                            enemy.changeSpeed(0,-(enemy.defaultWalkSpeed-1)/enemy.speed[1]*enemy.speed[1])
+                            enemy.changeSpeed(0,-(enemy.defaultWalkSpeed-1)/enemy.speed[1]*enemy.speed[1]*speedMultiplier)
                     elif enemy.speed[1] == 0 and enemy.speed[0] != 0:
                         if enemy.speed[0] > 0:
-                            enemy.changeSpeed(enemy.defaultWalkSpeed-1/enemy.speed[0]*enemy.speed[0],0)
+                            enemy.changeSpeed(enemy.defaultWalkSpeed-1/enemy.speed[0]*enemy.speed[0]*speedMultiplier,0)
                         else:
-                            enemy.changeSpeed(-(enemy.defaultWalkSpeed-1)/enemy.speed[0]*enemy.speed[0],0)
+                            enemy.changeSpeed(-(enemy.defaultWalkSpeed-1)/enemy.speed[0]*enemy.speed[0]*speedMultiplier,0)
                     elif enemy.speed[0] != 0 and enemy.speed[1] != 0:
                         if enemy.speed[1] > 0:
-                            enemy.changeSpeed(enemy.speed[0],enemy.defaultWalkSpeed-1/enemy.speed[1]*enemy.speed[1])
+                            enemy.changeSpeed(enemy.speed[0],enemy.defaultWalkSpeed-1/enemy.speed[1]*enemy.speed[1]*speedMultiplier)
                         else:
-                            enemy.changeSpeed(enemy.speed[0],-(enemy.defaultWalkSpeed-1)/enemy.speed[1]*enemy.speed[1])
+                            enemy.changeSpeed(enemy.speed[0],-(enemy.defaultWalkSpeed-1)/enemy.speed[1]*enemy.speed[1]*speedMultiplier)
                         if enemy.speed[0] > 0:
-                            enemy.changeSpeed(enemy.defaultWalkSpeed-1/enemy.speed[0]*enemy.speed[0],enemy.speed[1])
+                            enemy.changeSpeed(enemy.defaultWalkSpeed-1/enemy.speed[0]*enemy.speed[0]*speedMultiplier,enemy.speed[1])
                         else:
-                            enemy.changeSpeed(-(enemy.defaultWalkSpeed-1)/enemy.speed[0]*enemy.speed[0],enemy.speed[1])
+                            enemy.changeSpeed(-(enemy.defaultWalkSpeed-1)/enemy.speed[0]*enemy.speed[0]*speedMultiplier,enemy.speed[1])
                     if slownessTimer[enemy] >= FPS/3:
                         slownessTimer[enemy] = 0
                         if enemy.speed[0] == 0 and enemy.speed[1] != 0:
@@ -329,16 +347,16 @@ while True:
                 key = f"{tower.sprite.rect.x} {tower.sprite.rect.y}"
                 projectile = tower.projectileSprite
                 if projectile in projectiles:
-                    if projectile.rect.colliderect(projectiles[projectile][0]-GRID_SIZE/3,projectiles[projectile][1]-GRID_SIZE/3,projectiles[projectile][0]+GRID_SIZE/3,projectiles[projectile][1]+GRID_SIZE/3):
+                    if projectile.rect.colliderect(projectiles[projectile][0]-GRID_SIZE/3,projectiles[projectile][1]-GRID_SIZE/3,GRID_SIZE/3,GRID_SIZE/3):
                         projectiles.pop(projectile)
                     else:
                         dx, dy = (projectiles[projectile][0] - projectile.rect.centerx, projectiles[projectile][1] - projectile.rect.centery)
-                        stepx, stepy = (dx / FPS*7, dy / FPS*7)
-                        projectile.rect.x += stepx
-                        projectile.rect.y += stepy
+                        stepx, stepy = (dx / FPS*13, dy / FPS*13)
+                        projectile.rect.centerx += stepx
+                        projectile.rect.centery += stepy
 
                 if key in towersTimer:
-                    towersTimer[key] += 1
+                    towersTimer[key] += 1*speedMultiplier
                     if towersTimer[key] >= tower.attacksPerSecond*FPS:
                         if tower.id != "farm":
                             targetEnemy = None
@@ -448,6 +466,20 @@ while True:
                 elif event.key == pygame.K_r:
                     if summonTimerTimes == summonTimerNeedTimes:
                         waveTimer = 45*FPS
+                elif event.key == pygame.K_1:
+                    speedMultiplier = 1
+                elif event.key == pygame.K_2:
+                    speedMultiplier = 2
+                elif event.key == pygame.K_3:
+                    speedMultiplier = 4
+                elif event.key == pygame.K_SPACE:
+                    if speedMultiplier != 0:
+                        prevSpeedMultiplier = speedMultiplier
+                        for enemy in enemiesOnMap:
+                            prevEnemiesSpeed[enemy] = enemy.speed
+                        speedMultiplier = 0
+                    else:
+                        speedMultiplier = prevSpeedMultiplier
                 elif event.key == pygame.K_x:
                     for tower in list(placedTowers):
                         if tower.sprite.rect.collidepoint(mx,my):

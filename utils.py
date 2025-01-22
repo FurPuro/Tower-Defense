@@ -1,27 +1,71 @@
 import pygame
 import math
+import os
 from config import *
 import random
+import cv2
+import numpy as np
 def loadLevel():
+    global level,marbies
+    level = fr"{LEVELS_DIR}/{random.choice(os.listdir(LEVELS_DIR))}"
     gridList = []
     grass_color = (random.randint(75,150),random.randint(75,150),random.randint(75,150))
     way_color = (random.randint(75,150),random.randint(75,150),random.randint(75,150))
-    save = open(fr"{LEVELS_DIR}\lvl{level}.txt")
-    for row,line in enumerate(save.read().replace(" ","").splitlines()):
-        for col,char in enumerate(line):
-            # print((row)*GRID_SIZE,(col)*GRID_SIZE,char)
-            obj = {
-                "id": char,
-                "x": (col)*GRID_SIZE,
-                "y": (row)*GRID_SIZE
-            }
-            if char == "0":
-                obj["color"] = (grass_color[0]+random.randint(-2,2),grass_color[1]+random.randint(-2,2),grass_color[2]+random.randint(-2,2))
-            elif char == "1" or char == "2" or char == "5" or char == "6" or char == "7" or char == "8":
-                obj["color"] = (way_color[0]+random.randint(-2,2),way_color[1]+random.randint(-2,2),way_color[2]+random.randint(-2,2))
-            elif char == "3":
-                obj["color"] = (CASTLE_COLOR[0]+random.randint(-2,2),CASTLE_COLOR[1]+random.randint(-2,2),CASTLE_COLOR[2]+random.randint(-2,2))
-            gridList.append(obj)
+    if ".png" in level:
+        img = cv2.imread(f'{level}',0)
+        rows,cols = img.shape
+        for row in range(rows):
+            for col in range(cols):
+                k = img[row,col]
+                if k == 195:
+                    char = "0"
+                elif k == 224:
+                    char = "1"
+                elif k == 183:
+                    char = "2"
+                elif k == 40:
+                    char = "3"
+                elif k == 97:
+                    char = "4"
+                elif k == 126:
+                    char = "5"
+                elif k == 95:
+                    char = "6"
+                elif k == 60:
+                    char = "7"
+                elif k == 47:
+                    char = "8"
+                else:
+                    char = "-1"
+                obj = {
+                    "id": char,
+                    "x": (col)*GRID_SIZE,
+                    "y": (row)*GRID_SIZE
+                }
+                if char == "0":
+                    obj["color"] = (grass_color[0]+random.randint(-2,2),grass_color[1]+random.randint(-2,2),grass_color[2]+random.randint(-2,2))
+                elif char == "1" or char == "2" or char == "5" or char == "6" or char == "7" or char == "8":
+                    obj["color"] = (way_color[0]+random.randint(-2,2),way_color[1]+random.randint(-2,2),way_color[2]+random.randint(-2,2))
+                elif char == "3":
+                    obj["color"] = (CASTLE_COLOR[0]+random.randint(-2,2),CASTLE_COLOR[1]+random.randint(-2,2),CASTLE_COLOR[2]+random.randint(-2,2))
+                gridList.append(obj)
+    else:
+        save = open(fr"{level}")
+        for row,line in enumerate(save.read().replace(" ","").splitlines()):
+            for col,char in enumerate(line):
+                obj = {
+                    "id": char,
+                    "x": (col)*GRID_SIZE,
+                    "y": (row)*GRID_SIZE
+                }
+                if char == "0":
+                    obj["color"] = (grass_color[0]+random.randint(-2,2),grass_color[1]+random.randint(-2,2),grass_color[2]+random.randint(-2,2))
+                elif char == "1" or char == "2" or char == "5" or char == "6" or char == "7" or char == "8":
+                    obj["color"] = (way_color[0]+random.randint(-2,2),way_color[1]+random.randint(-2,2),way_color[2]+random.randint(-2,2))
+                elif char == "3":
+                    obj["color"] = (CASTLE_COLOR[0]+random.randint(-2,2),CASTLE_COLOR[1]+random.randint(-2,2),CASTLE_COLOR[2]+random.randint(-2,2))
+                gridList.append(obj)
+        save.close()
     marbies = START_MARBIES
     return gridList
 def getObjectInGrid(x,y):
@@ -32,7 +76,6 @@ def getObjectInGrid(x,y):
     return None
 def generateWave(waves):
     global waveTen
-    print(waves,waveTen)
     for enemy in enemies:
         if waveTen > 1 and enemy not in enemiesOnMap:
             enemy.health += enemy.health/2.5

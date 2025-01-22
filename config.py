@@ -31,6 +31,8 @@ spawnCenterY = 0
 castle_health = CASTLE_MAX_HEALTH
 grass_color = (0,0,0)
 way_color = (0,0,0)
+speedMultiplier = 1
+prevSpeedMultiplier = 1
 
 #Directories
 ASSETS_DIR = rf"assets"
