@@ -11,6 +11,9 @@ def loadLevel():
     gridList = []
     grass_color = (random.randint(75,150),random.randint(75,150),random.randint(75,150))
     way_color = (random.randint(75,150),random.randint(75,150),random.randint(75,150))
+    while (grass_color[0] > way_color[0]-5 and grass_color[0] < way_color[0]+5) or (grass_color[1] > way_color[1]-5 and grass_color[1] < way_color[1]+5) or (grass_color[2] > way_color[2]-5 and grass_color[2] < way_color[2]+5):
+        grass_color = (random.randint(75,150),random.randint(75,150),random.randint(75,150))
+        way_color = (random.randint(75,150),random.randint(75,150),random.randint(75,150))
     if ".png" in level:
         img = cv2.imread(f'{level}',0)
         rows,cols = img.shape

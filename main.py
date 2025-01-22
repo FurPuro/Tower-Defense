@@ -61,7 +61,7 @@ infobutton.sprite.display = pygame.transform.scale(infobutton.sprite.display,(in
 
 bowTower = Tower(0,0,90,90,"none",fr"{IMAGES_DIR}\bowTurret.png",fr"{IMAGES_DIR}\arrow.png","bow",125,250,1,2,1.2,1.7,270,360,[],0,0)
 cannonTower = Tower(0,0,90,90,"none",fr"{IMAGES_DIR}\cannonTurret.png",fr"{IMAGES_DIR}\core.png","cannon",200,325,4,3,2,1.25,180,270,[],45,1200)
-piqueTower = Tower(0,0,90,90,"none",fr"{IMAGES_DIR}\piqueTurret.png",fr"{IMAGES_DIR}\piqueProjectile.png","pique",150,275,0.5,1,0.75,1,90,120,[],10,1000)
+piqueTower = Tower(0,0,90,90,"none",fr"{IMAGES_DIR}\piqueTurret.png",fr"{IMAGES_DIR}\piqueProjectile.png","pique",150,275,0.5,1,0.75,1,100,130,[],10,1000)
 staffTower = Tower(0,0,90,90,"none",fr"{IMAGES_DIR}\staffTurret.png",fr"{IMAGES_DIR}\magicalProjectile.png","staff",230,400,3,4,1.8,1.7,210,300,[],0,1800)
 farmTower = Tower(0,0,90,90,"none",fr"{IMAGES_DIR}\farmTurret.png",fr"{IMAGES_DIR}\none.png","farm",100,300,0,0,8,7,0,0,[],0,2000)
 
@@ -144,8 +144,8 @@ while True:
             text1 = smallBasicFont.render(f"PRICE: {tower.price} > {tower.upgradePrice}",True,(0,255,255))
             text2 = smallBasicFont.render(f"DAMAGE: {tower.damage} > {tower.upgradeDamage}",True,(0,255,255))
             text3 = smallBasicFont.render(f"ATTACKSPEED: {tower.attacksPerSecond} > {tower.upgradedAttacksPerSecond}",True,(0,255,255))
-            text4 = smallBasicFont.render(f"DISTANCE: {tower.maxDistance/GRID_SIZE} > {tower.upgradedMaxDistance/GRID_SIZE}",True,(0,255,255))
-            text5 = smallBasicFont.render(f"ATTACKRADIUS: {tower.attackRadius/GRID_SIZE}",True,(0,255,255))
+            text4 = smallBasicFont.render(f"DISTANCE: {round(tower.maxDistance/GRID_SIZE,1)} > {round(tower.upgradedMaxDistance/GRID_SIZE,1)}",True,(0,255,255))
+            text5 = smallBasicFont.render(f"ATTACKRADIUS: {round(tower.attackRadius/GRID_SIZE,1)}",True,(0,255,255))
             text6 = smallBasicFont.render(f"GOLD PRICE: {tower.gPrice}",True,(0,255,255))
             screen.blit(text1, (tower.sprite.rect.x,tower.sprite.rect.y+tower.sprite.rect.h+smallBasicFont.get_linesize()*0,text1.get_rect().w,text1.get_rect().h))
             screen.blit(text2, (tower.sprite.rect.x,tower.sprite.rect.y+tower.sprite.rect.h+smallBasicFont.get_linesize()*1,text2.get_rect().w,text2.get_rect().h))
@@ -198,7 +198,7 @@ while True:
     elif game_state == "game":
         screen.fill(GAME_BG_COLOR)
         marbiesText = basicFont.render(f"MARBIES: {round(marbies,1)}",True,WHITE)
-        healthText = basicFont.render(f"CASTLE HEALTH: {castle_health}",True,WHITE)
+        healthText = basicFont.render(f"CASTLE HEALTH: {round(castle_health)}",True,WHITE)
         goldText = basicFont.render(f"GOLD: {gold}",True,WHITE)
         wavesText = basicFont.render(f"WAVE: {wave}",True,WHITE)
         for tower in placedTowers:
@@ -297,24 +297,24 @@ while True:
                     slownessTimer[enemy] += 1*speedMultiplier
                     if enemy.speed[0] == 0 and enemy.speed[1] != 0:
                         if enemy.speed[1] > 0:
-                            enemy.changeSpeed(0,enemy.defaultWalkSpeed-1/enemy.speed[1]*enemy.speed[1]*speedMultiplier)
+                            enemy.changeSpeed(0,enemy.defaultWalkSpeed-1/enemy.speed[1]*enemy.speed[1])
                         else:
-                            enemy.changeSpeed(0,-(enemy.defaultWalkSpeed-1)/enemy.speed[1]*enemy.speed[1]*speedMultiplier)
+                            enemy.changeSpeed(0,-(enemy.defaultWalkSpeed-1)/enemy.speed[1]*enemy.speed[1])
                     elif enemy.speed[1] == 0 and enemy.speed[0] != 0:
                         if enemy.speed[0] > 0:
-                            enemy.changeSpeed(enemy.defaultWalkSpeed-1/enemy.speed[0]*enemy.speed[0]*speedMultiplier,0)
+                            enemy.changeSpeed(enemy.defaultWalkSpeed-1/enemy.speed[0]*enemy.speed[0],0)
                         else:
-                            enemy.changeSpeed(-(enemy.defaultWalkSpeed-1)/enemy.speed[0]*enemy.speed[0]*speedMultiplier,0)
+                            enemy.changeSpeed(-(enemy.defaultWalkSpeed-1)/enemy.speed[0]*enemy.speed[0],0)
                     elif enemy.speed[0] != 0 and enemy.speed[1] != 0:
                         if enemy.speed[1] > 0:
-                            enemy.changeSpeed(enemy.speed[0],enemy.defaultWalkSpeed-1/enemy.speed[1]*enemy.speed[1]*speedMultiplier)
+                            enemy.changeSpeed(enemy.speed[0],enemy.defaultWalkSpeed-1/enemy.speed[1]*enemy.speed[1])
                         else:
-                            enemy.changeSpeed(enemy.speed[0],-(enemy.defaultWalkSpeed-1)/enemy.speed[1]*enemy.speed[1]*speedMultiplier)
+                            enemy.changeSpeed(enemy.speed[0],-(enemy.defaultWalkSpeed-1)/enemy.speed[1]*enemy.speed[1])
                         if enemy.speed[0] > 0:
-                            enemy.changeSpeed(enemy.defaultWalkSpeed-1/enemy.speed[0]*enemy.speed[0]*speedMultiplier,enemy.speed[1])
+                            enemy.changeSpeed(enemy.defaultWalkSpeed-1/enemy.speed[0]*enemy.speed[0],enemy.speed[1])
                         else:
-                            enemy.changeSpeed(-(enemy.defaultWalkSpeed-1)/enemy.speed[0]*enemy.speed[0]*speedMultiplier,enemy.speed[1])
-                    if slownessTimer[enemy] >= FPS/3:
+                            enemy.changeSpeed(-(enemy.defaultWalkSpeed-1)/enemy.speed[0]*enemy.speed[0],enemy.speed[1])
+                    if slownessTimer[enemy] >= FPS/5:
                         slownessTimer[enemy] = 0
                         if enemy.speed[0] == 0 and enemy.speed[1] != 0:
                             if enemy.speed[1] > 0:
@@ -404,8 +404,8 @@ while True:
                     text1 = smallBasicFont.render(f"PRC: {tower.price} > {tower.upgradePrice}",True,(0,255,255))
                     text2 = smallBasicFont.render(f"DMG: {tower.damage} > {tower.upgradeDamage}",True,(0,255,255))
                     text3 = smallBasicFont.render(f"ATKSPD: {tower.attacksPerSecond} > {tower.upgradedAttacksPerSecond}",True,(0,255,255))
-                    text4 = smallBasicFont.render(f"DST: {tower.maxDistance/GRID_SIZE} > {tower.upgradedMaxDistance/GRID_SIZE}",True,(0,255,255))
-                    text5 = smallBasicFont.render(f"ATKRAD: {tower.attackRadius/GRID_SIZE}",True,(0,255,255))
+                    text4 = smallBasicFont.render(f"DST: {round(tower.maxDistance/GRID_SIZE,1)} > {round(tower.upgradedMaxDistance/GRID_SIZE,1)}",True,(0,255,255))
+                    text5 = smallBasicFont.render(f"ATKRAD: {round(tower.attackRadius/GRID_SIZE,1)}",True,(0,255,255))
                     screen.blit(text1, (tower.sprite.rect.x,tower.sprite.rect.y+smallBasicFont.get_linesize()*0,text1.get_rect().w,text1.get_rect().h))
                     screen.blit(text2, (tower.sprite.rect.x,tower.sprite.rect.y+smallBasicFont.get_linesize()*1,text2.get_rect().w,text2.get_rect().h))
                     screen.blit(text3, (tower.sprite.rect.x,tower.sprite.rect.y+smallBasicFont.get_linesize()*2,text3.get_rect().w,text3.get_rect().h))
