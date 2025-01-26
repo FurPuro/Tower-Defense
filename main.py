@@ -268,7 +268,7 @@ while True:
             for obj in grid:
                 if "color" in obj and "x" in obj and "y" in obj and "id" in obj:
                     enemyHitbox = pygame.rect.Rect(enemy.sprite.rect.centerx-(5*speedMultiplier),enemy.sprite.rect.centery-(5*speedMultiplier),5*speedMultiplier+1,5*speedMultiplier+1)
-                    if enemyHitbox.collidepoint(obj["x"]+GRID_SIZE/2,obj["y"]+GRID_SIZE/2) and enemy in enemiesOnMap: # enemy.sprite.rect.centerx >= obj["x"]+GRID_SIZE/2 and enemy.sprite.rect.centery >= obj["y"]+GRID_SIZE/2 and enemy.sprite.rect.centerx <= obj["x"]+GRID_SIZE and enemy.sprite.rect.centery <= obj["y"]+GRID_SIZE and enemy.sprite.rect.centerx >= 0 and enemy.sprite.rect.centery >= 0 and enemy.sprite.rect.centerx <= WIDTH and enemy.sprite.rect.centery <= HEIGHT:
+                    if enemyHitbox.collidepoint(obj["x"]+GRID_SIZE/2,obj["y"]+GRID_SIZE/2) and enemy in enemiesOnMap:
                         if obj != None:
                             if obj["id"] == "5":
                                 enemy.changeSpeed(enemy.defaultWalkSpeed*speedMultiplier,0)
@@ -483,7 +483,6 @@ while True:
                 elif event.key == pygame.K_e:
                     for tower in placedTowers:
                         if tower.sprite.rect.collidepoint(mx,my):
-                            # print(mx,my,tower.sprite.rect)
                             if not holdingAlt:
                                 if tower.upgraded == False and tower.upgraded2 == False and marbies >= tower.upgradePrice:
                                     successfully = tower.upgrade()
