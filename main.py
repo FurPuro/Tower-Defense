@@ -535,5 +535,3 @@ while True:
     pygame.display.set_caption(f"Tower Defense (FPS - {round(clock.get_fps())}, State - {str.capitalize(game_state)})")
     pygame.display.update()
     clock.tick(FPS)
-
-#ДЗ проект
