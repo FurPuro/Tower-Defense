@@ -176,7 +176,7 @@ while True:
                                 have_this = True
                         if have_this == False:
                             if gold >= tower.gPrice:
-                                gold -= tower.gPriceTower
+                                gold -= tower.gPrice
                                 selected_tower = tower.copy()
                                 equippedTowers.append(selected_tower)
     elif game_state == "info":
@@ -268,7 +268,7 @@ while True:
             for obj in grid:
                 if "color" in obj and "x" in obj and "y" in obj and "id" in obj:
                     enemyHitbox = pygame.rect.Rect(enemy.sprite.rect.centerx-(5*speedMultiplier),enemy.sprite.rect.centery-(5*speedMultiplier),5*speedMultiplier+1,5*speedMultiplier+1)
-                    if enemyHitbox.collidepoint(obj["x"]+GRID_SIZE/2,obj["y"]+GRID_SIZE/2): # enemy.sprite.rect.centerx >= obj["x"]+GRID_SIZE/2 and enemy.sprite.rect.centery >= obj["y"]+GRID_SIZE/2 and enemy.sprite.rect.centerx <= obj["x"]+GRID_SIZE and enemy.sprite.rect.centery <= obj["y"]+GRID_SIZE and enemy.sprite.rect.centerx >= 0 and enemy.sprite.rect.centery >= 0 and enemy.sprite.rect.centerx <= WIDTH and enemy.sprite.rect.centery <= HEIGHT:
+                    if enemyHitbox.collidepoint(obj["x"]+GRID_SIZE/2,obj["y"]+GRID_SIZE/2) and enemy in enemiesOnMap: # enemy.sprite.rect.centerx >= obj["x"]+GRID_SIZE/2 and enemy.sprite.rect.centery >= obj["y"]+GRID_SIZE/2 and enemy.sprite.rect.centerx <= obj["x"]+GRID_SIZE and enemy.sprite.rect.centery <= obj["y"]+GRID_SIZE and enemy.sprite.rect.centerx >= 0 and enemy.sprite.rect.centery >= 0 and enemy.sprite.rect.centerx <= WIDTH and enemy.sprite.rect.centery <= HEIGHT:
                         if obj != None:
                             if obj["id"] == "5":
                                 enemy.changeSpeed(enemy.defaultWalkSpeed*speedMultiplier,0)
