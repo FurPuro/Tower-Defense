@@ -5,6 +5,7 @@ from tower import Tower
 from enemy import Enemy
 from config import *
 import os
+import sys
 import math
 from utils import loadLevel,generateWave,lookAt,calculateDistance,projectileLookAt,rotate
 
@@ -20,12 +21,16 @@ basicFont = pygame.font.SysFont("Comic Sans MS",15)
 smallBasicFont = pygame.font.SysFont("Comic Sans MS",10)
 largeBasicFont = pygame.font.SysFont("Comic Sans MS",45)
 infoText1 = largeBasicFont.render("Controls:",True,(150,150,150))
-infoText2 = largeBasicFont.render("E - Upgrade tower",True,(150,150,150))
+infoText2 = largeBasicFont.render("E | Alt+E - Upgrade tower",True,(150,150,150))
 infoText3 = largeBasicFont.render("X - Sell tower",True,(150,150,150))
 infoText4 = largeBasicFont.render("TAB - Open/Close Hotbar (Hold)",True,(150,150,150))
 infoText5 = basicFont.render("By FurPuro (Main Devoloper) & sazin66644 (j.Designer)",True,(150,150,150))
 infoText6 = largeBasicFont.render(f"Max Towers - {MAX_TOWERS}",True,(150,150,150))
 infoText7 = largeBasicFont.render("R - Skip wave",True,(150,150,150))
+infoText8 = largeBasicFont.render("1,2,3 - Change speed multiplier",True,(150,150,150))
+infoText9 = largeBasicFont.render("Space - Pause (za warudo)",True,(150,150,150))
+
+holdingAlt = False
 
 background = pygame.image.load(fr"{IMAGES_DIR}\MenuBackground.png")
 background = pygame.transform.scale(background,(WIDTH,HEIGHT))
@@ -68,6 +73,7 @@ farmTower = Tower(0,0,90,90,"none",fr"{IMAGES_DIR}\farmTurret.png",fr"{IMAGES_DI
 towersTimer = {}
 projectiles = {}
 slownessTimer = {}
+onFireTimer = {}
 prevEnemiesSpeed = {}
 shopTowers = []
 
@@ -127,8 +133,7 @@ while True:
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                pygame.quit()
-                quit()
+                sys.exit()
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 for button in buttons:
                     if button.sprite.rect.collidepoint(pygame.mouse.get_pos()[0],pygame.mouse.get_pos()[1]) and button.sprite.state == game_state:
@@ -158,8 +163,7 @@ while True:
         for event in pygame.event.get():
             mx,my = pygame.mouse.get_pos()
             if event.type == pygame.QUIT:
-                pygame.quit()
-                quit()
+                sys.exit()
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 for button in buttons:
                     if button.sprite.rect.collidepoint(pygame.mouse.get_pos()[0],pygame.mouse.get_pos()[1]) and button.sprite.state == game_state:
@@ -172,8 +176,8 @@ while True:
                                 have_this = True
                         if have_this == False:
                             if gold >= tower.gPrice:
-                                gold -= tower.gPrice
-                                selected_tower = Tower(tower.sprite.rect.x,tower.sprite.rect.y,tower.sprite.rect.w,tower.sprite.rect.h,tower.sprite.state,tower.sprite.path,tower.projectileSprite.path,tower.id,tower.price,tower.upgradePrice,tower.damage,tower.upgradeDamage,tower.attacksPerSecond,tower.upgradedAttacksPerSecond,tower.maxDistance,tower.upgradedMaxDistance,tower.territories,tower.attackRadius,tower.gPrice)
+                                gold -= tower.gPriceTower
+                                selected_tower = tower.copy()
                                 equippedTowers.append(selected_tower)
     elif game_state == "info":
         screen.fill(MENU_BG_COLOR)
@@ -183,8 +187,10 @@ while True:
         screen.blit(infoText3, (60,30+largeBasicFont.get_linesize()*2,infoText3.get_rect().w,infoText3.get_rect().h))
         screen.blit(infoText4, (60,30+largeBasicFont.get_linesize()*3,infoText4.get_rect().w,infoText4.get_rect().h))
         screen.blit(infoText5, (WIDTH-infoText5.get_width(),HEIGHT-basicFont.get_linesize()*1,infoText5.get_rect().w,infoText5.get_rect().h))
-        screen.blit(infoText6, (30,30+largeBasicFont.get_linesize()*5,infoText6.get_rect().w,infoText6.get_rect().h))
+        screen.blit(infoText6, (30,30+largeBasicFont.get_linesize()*7,infoText6.get_rect().w,infoText6.get_rect().h))
         screen.blit(infoText7, (60,30+largeBasicFont.get_linesize()*4,infoText7.get_rect().w,infoText7.get_rect().h))
+        screen.blit(infoText8, (60,30+largeBasicFont.get_linesize()*5,infoText8.get_rect().w,infoText8.get_rect().h))
+        screen.blit(infoText9, (60,30+largeBasicFont.get_linesize()*6,infoText9.get_rect().w,infoText9.get_rect().h))
 
         for event in pygame.event.get():
             mx,my = pygame.mouse.get_pos()
@@ -337,12 +343,21 @@ while True:
                                 enemy.changeSpeed(-enemy.defaultWalkSpeed,enemy.speed[1])
                             
                         slownessTimer.pop(enemy)
+        if onFireTimer:
+            for enemy in enemiesOnMap:
+                if enemy in onFireTimer:
+                    onFireTimer[enemy] += 1*speedMultiplier
+                    if onFireTimer[enemy] % FPS/10*speedMultiplier == 1:
+                        enemy.health -= 1
+                    if onFireTimer[enemy] >= FPS*2:
+                        onFireTimer[enemy] = 0
+                        onFireTimer.pop(enemy)
 
         for tower in placedTowers:
             tower.sprite.draw(screen)
         if towersTimer:
             for projectile in projectiles:
-                projectile.draw(screen) 
+                projectile.draw(screen)
             for tower in placedTowers:
                 key = f"{tower.sprite.rect.x} {tower.sprite.rect.y}"
                 projectile = tower.projectileSprite
@@ -379,8 +394,15 @@ while True:
                                                 enemy.health -= tower.damage
                                 else:
                                     targetEnemy.health -= tower.damage
-                                if tower.id == "pique" and tower.upgraded == True:
-                                    slownessTimer[targetEnemy] = 0
+                                if tower.id == "pique":
+                                    if tower.upgraded == True:
+                                        slownessTimer[targetEnemy] = 0
+                                        if targetEnemy in onFireTimer:
+                                            onFireTimer[targetEnemy] = FPS*2
+                                    elif tower.upgraded2 == True:
+                                        onFireTimer[targetEnemy] = 0
+                                        if targetEnemy in slownessTimer:
+                                            slownessTimer[targetEnemy] = FPS
                                 if projectile not in projectiles:
                                     projectiles[projectile] = (targetEnemy.sprite.rect.centerx,targetEnemy.sprite.rect.centery)
                                     projectile.rect.centerx = tower.sprite.rect.centerx
@@ -418,12 +440,11 @@ while True:
         for event in pygame.event.get():
             mx,my = pygame.mouse.get_pos()
             if event.type == pygame.QUIT:
-                pygame.quit()
-                quit()
+                sys.exit()
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 for tower in equippedTowers:
                     if tower.sprite.rect.collidepoint(mx,my) and hotbar_opened == True:
-                        selected_tower = Tower(tower.sprite.rect.x,tower.sprite.rect.y,tower.sprite.rect.w,tower.sprite.rect.h,tower.sprite.state,tower.sprite.path,tower.projectileSprite.path,tower.id,tower.price,tower.upgradePrice,tower.damage,tower.upgradeDamage,tower.attacksPerSecond,tower.upgradedAttacksPerSecond,tower.maxDistance,tower.upgradedMaxDistance,tower.territories,tower.attackRadius,tower.gPrice)
+                        selected_tower = tower.copy()
                 if selected_tower != None and hotbar_opened == False and len(placedTowers) < MAX_TOWERS:
                     for obj in grid:
                         if "color" in obj and "x" in obj and "y" in obj and "id" in obj:
@@ -449,20 +470,30 @@ while True:
                                                         territories.append(obj2)
                                                         obj2["color"] = (obj2["color"][0]-10,obj2["color"][1]-10,obj2["color"][2]-10)
 
-                                    placedTower = Tower(selected_tower.sprite.rect.x,selected_tower.sprite.rect.y,selected_tower.sprite.rect.w,selected_tower.sprite.rect.h,selected_tower.sprite.state,selected_tower.sprite.path,selected_tower.projectileSprite.path,selected_tower.id,selected_tower.price,selected_tower.upgradePrice,selected_tower.damage,selected_tower.upgradeDamage,selected_tower.attacksPerSecond,selected_tower.upgradedAttacksPerSecond,selected_tower.maxDistance,selected_tower.upgradedMaxDistance,territories,selected_tower.attackRadius,selected_tower.gPrice)
+                                    placedTower = selected_tower.copy()
                                     placedTower.sprite.rect.x = obj["x"]-GRID_SIZE
                                     placedTower.sprite.rect.y = obj["y"]-GRID_SIZE
+                                    placedTower.territories = territories
                                     placedTowers.append(placedTower)                                           
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_TAB:
                     hotbar_opened = True
+                elif event.key == pygame.K_LALT:
+                    holdingAlt = True
                 elif event.key == pygame.K_e:
                     for tower in placedTowers:
                         if tower.sprite.rect.collidepoint(mx,my):
                             # print(mx,my,tower.sprite.rect)
-                            if tower.upgraded == False and marbies >= tower.upgradePrice:
-                                marbies -= tower.upgradePrice
-                                tower.upgrade()
+                            if not holdingAlt:
+                                if tower.upgraded == False and tower.upgraded2 == False and marbies >= tower.upgradePrice:
+                                    successfully = tower.upgrade()
+                                    if successfully:
+                                        marbies -= tower.upgradePrice
+                            else:
+                                if tower.upgraded2 == False and tower.upgraded == False and marbies >= tower.upgradePrice:
+                                    successfully = tower.upgrade2()
+                                    if successfully:
+                                        marbies -= tower.upgradePrice
                 elif event.key == pygame.K_r:
                     if summonTimerTimes == summonTimerNeedTimes:
                         waveTimer = 45*FPS
@@ -486,7 +517,7 @@ while True:
                             marbies += tower.price/1.75
                             for obj in grid:
                                 for terObj in tower.territories:
-                                    if obj == terObj:
+                                    if obj["x"] == terObj["x"] and obj["y"] == terObj["y"]:
                                         obj["id"] = "0"
                                         obj["color"] = (obj["color"][0]+10,obj["color"][1]+10,obj["color"][2]+10)
                             if tower.projectileSprite in projectiles:
@@ -495,6 +526,8 @@ while True:
             elif event.type == pygame.KEYUP:
                 if event.key == pygame.K_TAB:
                     hotbar_opened = False
+                elif event.key == pygame.K_LALT:
+                    holdingAlt = False
 
 
     for sprite in sprites:

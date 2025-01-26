@@ -181,3 +181,11 @@ build/main/localpycs/pyimod03_ctypes.pyc
 build/main/localpycs/pyimod04_pywin32.pyc
 build/main/localpycs/struct.pyc
 build.bat
+__pycache__/button.cpython-313.pyc
+__pycache__/config.cpython-313.pyc
+__pycache__/enemy.cpython-313.pyc
+__pycache__/sprite.cpython-313.pyc
+__pycache__/tower.cpython-313.pyc
+__pycache__/utils.cpython-313.pyc
+dist/Tower-Defense_V0.8.rar
+dist/main/assets/images/piqueTurretUpgraded2.png
