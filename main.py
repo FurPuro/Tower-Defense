@@ -83,6 +83,11 @@ for tower in towers:
     if tower.gPrice > 0:
         shopTowers.append(tower)
 
+if not os.path.exists(SAVES_DIR):
+    os.makedirs(SAVES_DIR)
+if not os.path.exists(fr"{SAVES_DIR}\save0.txt"):
+    open(fr"{SAVES_DIR}\save0.txt","w").close()
+
 save = open(fr"{SAVES_DIR}\save0.txt","r+")
 saveLines = save.readlines()
 if saveLines:
@@ -112,8 +117,8 @@ save.close()
 
 basicZombie = Enemy(0,0,60,60,"none",fr"{IMAGES_DIR}\basicZombie.png","basicZombie",1,13,False)
 fastZombie = Enemy(0,0,60,60,"none",fr"{IMAGES_DIR}\fastZombie.png","fastZombie",1.5,8,False)
-heavyZombie = Enemy(0,0,60,60,"none",fr"{IMAGES_DIR}\heavyZombie.png","heavyZombie",0.5,40,False)
-basicBossZombie = Enemy(0,0,90,90,"none",fr"{IMAGES_DIR}\basicBossZombie.png","basicBossZombie",1.25,120,False)
+heavyZombie = Enemy(0,0,60,60,"none",fr"{IMAGES_DIR}\heavyZombie.png","heavyZombie",0.75,40,False)
+basicBossZombie = Enemy(0,0,90,90,"none",fr"{IMAGES_DIR}\basicBossZombie.png","basicBossZombie",0.9,120,False)
 
 while True:
     save = open(fr"{SAVES_DIR}\save0.txt","w")
@@ -305,23 +310,23 @@ while True:
                     slownessTimer[enemy] -= 1*speedMultiplier
                     if enemy.speed[0] == 0 and enemy.speed[1] != 0:
                         if enemy.speed[1] > 0:
-                            enemy.changeSpeed(0,enemy.defaultWalkSpeed-0.4/enemy.speed[1]*enemy.speed[1])
+                            enemy.changeSpeed(0,enemy.defaultWalkSpeed-0.6/enemy.speed[1]*enemy.speed[1])
                         else:
-                            enemy.changeSpeed(0,-(enemy.defaultWalkSpeed-0.4)/enemy.speed[1]*enemy.speed[1])
+                            enemy.changeSpeed(0,-(enemy.defaultWalkSpeed-0.6)/enemy.speed[1]*enemy.speed[1])
                     elif enemy.speed[1] == 0 and enemy.speed[0] != 0:
                         if enemy.speed[0] > 0:
-                            enemy.changeSpeed(enemy.defaultWalkSpeed-0.4/enemy.speed[0]*enemy.speed[0],0)
+                            enemy.changeSpeed(enemy.defaultWalkSpeed-0.6/enemy.speed[0]*enemy.speed[0],0)
                         else:
-                            enemy.changeSpeed(-(enemy.defaultWalkSpeed-0.4)/enemy.speed[0]*enemy.speed[0],0)
+                            enemy.changeSpeed(-(enemy.defaultWalkSpeed-0.6)/enemy.speed[0]*enemy.speed[0],0)
                     elif enemy.speed[0] != 0 and enemy.speed[1] != 0:
                         if enemy.speed[1] > 0:
-                            enemy.changeSpeed(enemy.speed[0],enemy.defaultWalkSpeed-0.4/enemy.speed[1]*enemy.speed[1])
+                            enemy.changeSpeed(enemy.speed[0],enemy.defaultWalkSpeed-0.6/enemy.speed[1]*enemy.speed[1])
                         else:
-                            enemy.changeSpeed(enemy.speed[0],-(enemy.defaultWalkSpeed-1)/enemy.speed[1]*enemy.speed[1])
+                            enemy.changeSpeed(enemy.speed[0],-(enemy.defaultWalkSpeed-0.6)/enemy.speed[1]*enemy.speed[1])
                         if enemy.speed[0] > 0:
-                            enemy.changeSpeed(enemy.defaultWalkSpeed-0.4/enemy.speed[0]*enemy.speed[0],enemy.speed[1])
+                            enemy.changeSpeed(enemy.defaultWalkSpeed-0.6/enemy.speed[0]*enemy.speed[0],enemy.speed[1])
                         else:
-                            enemy.changeSpeed(-(enemy.defaultWalkSpeed-0.4)/enemy.speed[0]*enemy.speed[0],enemy.speed[1])
+                            enemy.changeSpeed(-(enemy.defaultWalkSpeed-0.6)/enemy.speed[0]*enemy.speed[0],enemy.speed[1])
                     if slownessTimer[enemy] <= 0:
                         slownessTimer[enemy] = 0
                         if enemy.speed[0] == 0 and enemy.speed[1] != 0:
@@ -349,10 +354,48 @@ while True:
             for enemy in enemiesOnMap:
                 if enemy in onFireTimer:
                     onFireTimer[enemy] -= 1*speedMultiplier
+                    if enemy.speed[0] == 0 and enemy.speed[1] != 0:
+                        if enemy.speed[1] > 0:
+                            enemy.changeSpeed(0,enemy.defaultWalkSpeed-0.1/enemy.speed[1]*enemy.speed[1])
+                        else:
+                            enemy.changeSpeed(0,-(enemy.defaultWalkSpeed-0.1)/enemy.speed[1]*enemy.speed[1])
+                    elif enemy.speed[1] == 0 and enemy.speed[0] != 0:
+                        if enemy.speed[0] > 0:
+                            enemy.changeSpeed(enemy.defaultWalkSpeed-0.1/enemy.speed[0]*enemy.speed[0],0)
+                        else:
+                            enemy.changeSpeed(-(enemy.defaultWalkSpeed-0.1)/enemy.speed[0]*enemy.speed[0],0)
+                    elif enemy.speed[0] != 0 and enemy.speed[1] != 0:
+                        if enemy.speed[1] > 0:
+                            enemy.changeSpeed(enemy.speed[0],enemy.defaultWalkSpeed-0.1/enemy.speed[1]*enemy.speed[1])
+                        else:
+                            enemy.changeSpeed(enemy.speed[0],-(enemy.defaultWalkSpeed-0.1)/enemy.speed[1]*enemy.speed[1])
+                        if enemy.speed[0] > 0:
+                            enemy.changeSpeed(enemy.defaultWalkSpeed-0.1/enemy.speed[0]*enemy.speed[0],enemy.speed[1])
+                        else:
+                            enemy.changeSpeed(-(enemy.defaultWalkSpeed-0.1)/enemy.speed[0]*enemy.speed[0],enemy.speed[1])
                     if onFireTimer[enemy] % FPS/15*speedMultiplier == 1:
                         enemy.health -= 1
                     if onFireTimer[enemy] <= 0:
                         onFireTimer[enemy] = 0
+                        if enemy.speed[0] == 0 and enemy.speed[1] != 0:
+                            if enemy.speed[1] > 0:
+                                enemy.changeSpeed(0,enemy.defaultWalkSpeed)
+                            else:
+                                enemy.changeSpeed(0,-enemy.defaultWalkSpeed)
+                        elif enemy.speed[1] == 0 and enemy.speed[0] != 0:
+                            if enemy.speed[0] > 0:
+                                enemy.changeSpeed(enemy.defaultWalkSpeed,0)
+                            else:
+                                enemy.changeSpeed(-enemy.defaultWalkSpeed,0)
+                        elif enemy.speed[0] != 0 and enemy.speed[1] != 0:
+                            if enemy.speed[1] > 0:
+                                enemy.changeSpeed(enemy.speed[0],enemy.defaultWalkSpeed)
+                            else:
+                                enemy.changeSpeed(enemy.speed[0],-enemy.defaultWalkSpeed)
+                            if enemy.speed[0] > 0:
+                                enemy.changeSpeed(enemy.defaultWalkSpeed,enemy.speed[1])
+                            else:
+                                enemy.changeSpeed(-enemy.defaultWalkSpeed,enemy.speed[1])
                         onFireTimer.pop(enemy)
         if bleedingTimer:
             for enemy in enemiesOnMap:

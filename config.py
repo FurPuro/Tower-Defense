@@ -1,3 +1,5 @@
+from os import getenv
+
 #Game settings
 WIDTH,HEIGHT = 900,900
 FPS = 40
@@ -38,7 +40,7 @@ prevSpeedMultiplier = 1
 ASSETS_DIR = rf"assets"
 IMAGES_DIR = rf"assets\images"
 LEVELS_DIR = rf"assets\levels"
-SAVES_DIR = rf"assets\saves"
+SAVES_DIR = rf"{getenv("APPDATA")}\PTD\saves"
 
 #Colors
 MENU_BG_COLOR = (59, 64, 130)
