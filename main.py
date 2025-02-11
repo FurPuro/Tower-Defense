@@ -69,10 +69,12 @@ cannonTower = Tower(0,0,90,90,"none",fr"{IMAGES_DIR}\cannonTurret.png",fr"{IMAGE
 piqueTower = Tower(0,0,90,90,"none",fr"{IMAGES_DIR}\piqueTurret.png",fr"{IMAGES_DIR}\piqueProjectile.png","pique",150,275,0.5,1,0.75,1,100,130,[],10,1000)
 staffTower = Tower(0,0,90,90,"none",fr"{IMAGES_DIR}\staffTurret.png",fr"{IMAGES_DIR}\magicalProjectile.png","staff",230,400,3,4,1.8,1.7,210,300,[],0,1800)
 farmTower = Tower(0,0,90,90,"none",fr"{IMAGES_DIR}\farmTurret.png",fr"{IMAGES_DIR}\none.png","farm",100,300,0,0,8,7,0,0,[],0,2000)
+cleaverTower = Tower(0,0,90,90,"none",fr"{IMAGES_DIR}\cleaverTurret.png",fr"{IMAGES_DIR}\piqueProjectile.png","cleaver",165,215,0.6,0.75,0.75,0.95,110,140,[],15,1500)
 
 towersTimer = {}
 projectiles = {}
 slownessTimer = {}
+bleedingTimer = {}
 onFireTimer = {}
 prevEnemiesSpeed = {}
 shopTowers = []
@@ -108,10 +110,10 @@ else:
     equippedTowers.append(bowTower)
 save.close()
 
-basicZombie = Enemy(0,0,60,60,"none",fr"{IMAGES_DIR}\basicZombie.png","basicZombie",2,13,False)
-fastZombie = Enemy(0,0,60,60,"none",fr"{IMAGES_DIR}\fastZombie.png","fastZombie",3,8,False)
-heavyZombie = Enemy(0,0,60,60,"none",fr"{IMAGES_DIR}\heavyZombie.png","heavyZombie",1,40,False)
-basicBossZombie = Enemy(0,0,90,90,"none",fr"{IMAGES_DIR}\basicBossZombie.png","basicBossZombie",2,120,False)
+basicZombie = Enemy(0,0,60,60,"none",fr"{IMAGES_DIR}\basicZombie.png","basicZombie",1,13,False)
+fastZombie = Enemy(0,0,60,60,"none",fr"{IMAGES_DIR}\fastZombie.png","fastZombie",1.5,8,False)
+heavyZombie = Enemy(0,0,60,60,"none",fr"{IMAGES_DIR}\heavyZombie.png","heavyZombie",0.5,40,False)
+basicBossZombie = Enemy(0,0,90,90,"none",fr"{IMAGES_DIR}\basicBossZombie.png","basicBossZombie",1.25,120,False)
 
 while True:
     save = open(fr"{SAVES_DIR}\save0.txt","w")
@@ -300,27 +302,27 @@ while True:
         if slownessTimer:
             for enemy in enemiesOnMap:
                 if enemy in slownessTimer:
-                    slownessTimer[enemy] += 1*speedMultiplier
+                    slownessTimer[enemy] -= 1*speedMultiplier
                     if enemy.speed[0] == 0 and enemy.speed[1] != 0:
                         if enemy.speed[1] > 0:
-                            enemy.changeSpeed(0,enemy.defaultWalkSpeed-1/enemy.speed[1]*enemy.speed[1])
+                            enemy.changeSpeed(0,enemy.defaultWalkSpeed-0.4/enemy.speed[1]*enemy.speed[1])
                         else:
-                            enemy.changeSpeed(0,-(enemy.defaultWalkSpeed-1)/enemy.speed[1]*enemy.speed[1])
+                            enemy.changeSpeed(0,-(enemy.defaultWalkSpeed-0.4)/enemy.speed[1]*enemy.speed[1])
                     elif enemy.speed[1] == 0 and enemy.speed[0] != 0:
                         if enemy.speed[0] > 0:
-                            enemy.changeSpeed(enemy.defaultWalkSpeed-1/enemy.speed[0]*enemy.speed[0],0)
+                            enemy.changeSpeed(enemy.defaultWalkSpeed-0.4/enemy.speed[0]*enemy.speed[0],0)
                         else:
-                            enemy.changeSpeed(-(enemy.defaultWalkSpeed-1)/enemy.speed[0]*enemy.speed[0],0)
+                            enemy.changeSpeed(-(enemy.defaultWalkSpeed-0.4)/enemy.speed[0]*enemy.speed[0],0)
                     elif enemy.speed[0] != 0 and enemy.speed[1] != 0:
                         if enemy.speed[1] > 0:
-                            enemy.changeSpeed(enemy.speed[0],enemy.defaultWalkSpeed-1/enemy.speed[1]*enemy.speed[1])
+                            enemy.changeSpeed(enemy.speed[0],enemy.defaultWalkSpeed-0.4/enemy.speed[1]*enemy.speed[1])
                         else:
                             enemy.changeSpeed(enemy.speed[0],-(enemy.defaultWalkSpeed-1)/enemy.speed[1]*enemy.speed[1])
                         if enemy.speed[0] > 0:
-                            enemy.changeSpeed(enemy.defaultWalkSpeed-1/enemy.speed[0]*enemy.speed[0],enemy.speed[1])
+                            enemy.changeSpeed(enemy.defaultWalkSpeed-0.4/enemy.speed[0]*enemy.speed[0],enemy.speed[1])
                         else:
-                            enemy.changeSpeed(-(enemy.defaultWalkSpeed-1)/enemy.speed[0]*enemy.speed[0],enemy.speed[1])
-                    if slownessTimer[enemy] >= FPS/5:
+                            enemy.changeSpeed(-(enemy.defaultWalkSpeed-0.4)/enemy.speed[0]*enemy.speed[0],enemy.speed[1])
+                    if slownessTimer[enemy] <= 0:
                         slownessTimer[enemy] = 0
                         if enemy.speed[0] == 0 and enemy.speed[1] != 0:
                             if enemy.speed[1] > 0:
@@ -346,12 +348,21 @@ while True:
         if onFireTimer:
             for enemy in enemiesOnMap:
                 if enemy in onFireTimer:
-                    onFireTimer[enemy] += 1*speedMultiplier
-                    if onFireTimer[enemy] % FPS/10*speedMultiplier == 1:
+                    onFireTimer[enemy] -= 1*speedMultiplier
+                    if onFireTimer[enemy] % FPS/15*speedMultiplier == 1:
                         enemy.health -= 1
-                    if onFireTimer[enemy] >= FPS*2:
+                    if onFireTimer[enemy] <= 0:
                         onFireTimer[enemy] = 0
                         onFireTimer.pop(enemy)
+        if bleedingTimer:
+            for enemy in enemiesOnMap:
+                if enemy in bleedingTimer:
+                    bleedingTimer[enemy] -= 1*speedMultiplier
+                    if bleedingTimer[enemy] % FPS/15*speedMultiplier == 1:
+                        enemy.health -= 1
+                    if bleedingTimer[enemy] <= 0:
+                        bleedingTimer[enemy] = 0
+                        bleedingTimer.pop(enemy)
 
         for tower in placedTowers:
             tower.sprite.draw(screen)
@@ -396,13 +407,16 @@ while True:
                                     targetEnemy.health -= tower.damage
                                 if tower.id == "pique":
                                     if tower.upgraded == True:
-                                        slownessTimer[targetEnemy] = 0
+                                        slownessTimer[targetEnemy] = FPS
                                         if targetEnemy in onFireTimer:
-                                            onFireTimer[targetEnemy] = FPS*2
+                                            onFireTimer[targetEnemy] = 0
                                     elif tower.upgraded2 == True:
-                                        onFireTimer[targetEnemy] = 0
+                                        onFireTimer[targetEnemy] = FPS*2
                                         if targetEnemy in slownessTimer:
                                             slownessTimer[targetEnemy] = FPS
+                                if tower.id == "cleaver":
+                                    if tower.upgraded == False:
+                                        bleedingTimer[targetEnemy] = FPS*3
                                 if projectile not in projectiles:
                                     projectiles[projectile] = (targetEnemy.sprite.rect.centerx,targetEnemy.sprite.rect.centery)
                                     projectile.rect.centerx = tower.sprite.rect.centerx
