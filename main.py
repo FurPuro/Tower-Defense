@@ -354,6 +354,15 @@ while True:
             for enemy in enemiesOnMap:
                 if enemy in onFireTimer:
                     onFireTimer[enemy] -= 1*speedMultiplier
+                    if onFireTimer[enemy] % FPS/15*speedMultiplier == 1:
+                        enemy.health -= 1
+                    if onFireTimer[enemy] <= 0:
+                        onFireTimer[enemy] = 0
+                        onFireTimer.pop(enemy)
+        if bleedingTimer:
+            for enemy in enemiesOnMap:
+                if enemy in bleedingTimer:
+                    bleedingTimer[enemy] -= 1*speedMultiplier
                     if enemy.speed[0] == 0 and enemy.speed[1] != 0:
                         if enemy.speed[1] > 0:
                             enemy.changeSpeed(0,enemy.defaultWalkSpeed-0.1/enemy.speed[1]*enemy.speed[1])
@@ -373,10 +382,10 @@ while True:
                             enemy.changeSpeed(enemy.defaultWalkSpeed-0.1/enemy.speed[0]*enemy.speed[0],enemy.speed[1])
                         else:
                             enemy.changeSpeed(-(enemy.defaultWalkSpeed-0.1)/enemy.speed[0]*enemy.speed[0],enemy.speed[1])
-                    if onFireTimer[enemy] % FPS/15*speedMultiplier == 1:
+                    if bleedingTimer[enemy] % FPS/15*speedMultiplier == 1:
                         enemy.health -= 1
-                    if onFireTimer[enemy] <= 0:
-                        onFireTimer[enemy] = 0
+                    if bleedingTimer[enemy] <= 0:
+                        bleedingTimer[enemy] = 0
                         if enemy.speed[0] == 0 and enemy.speed[1] != 0:
                             if enemy.speed[1] > 0:
                                 enemy.changeSpeed(0,enemy.defaultWalkSpeed)
@@ -396,15 +405,6 @@ while True:
                                 enemy.changeSpeed(enemy.defaultWalkSpeed,enemy.speed[1])
                             else:
                                 enemy.changeSpeed(-enemy.defaultWalkSpeed,enemy.speed[1])
-                        onFireTimer.pop(enemy)
-        if bleedingTimer:
-            for enemy in enemiesOnMap:
-                if enemy in bleedingTimer:
-                    bleedingTimer[enemy] -= 1*speedMultiplier
-                    if bleedingTimer[enemy] % FPS/15*speedMultiplier == 1:
-                        enemy.health -= 1
-                    if bleedingTimer[enemy] <= 0:
-                        bleedingTimer[enemy] = 0
                         bleedingTimer.pop(enemy)
 
         for tower in placedTowers:
